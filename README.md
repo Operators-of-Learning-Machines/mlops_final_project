@@ -1,55 +1,31 @@
-# sclera_identity_classification
+# Sclera Identity Classificatoin
+## MLOps Exam project 
 
-A short description of the project.
+Martin Vlacil 254127
+Amalie Sommer Thomsen s200655
+Oskar Kocjancic 253070
+Andrei Soldan, s243873
 
-## Project structure
+### Project Goal
+The goal of the project is to identify a person's identity based on segmented images of their scleras (the white part of the eye). 
 
-The directory structure of the project looks like this:
-```txt
-├── .github/                  # Github actions and dependabot
-│   ├── dependabot.yaml
-│   └── workflows/
-│       └── tests.yaml
-├── configs/                  # Configuration files
-├── data/                     # Data directory
-│   ├── processed
-│   └── raw
-├── dockerfiles/              # Dockerfiles
-│   ├── api.Dockerfile
-│   └── train.Dockerfile
-├── docs/                     # Documentation
-│   ├── mkdocs.yml
-│   └── source/
-│       └── index.md
-├── models/                   # Trained models
-├── notebooks/                # Jupyter notebooks
-├── reports/                  # Reports
-│   └── figures/
-├── src/                      # Source code
-│   ├── project_name/
-│   │   ├── __init__.py
-│   │   ├── api.py
-│   │   ├── data.py
-│   │   ├── evaluate.py
-│   │   ├── models.py
-│   │   ├── train.py
-│   │   └── visualize.py
-└── tests/                    # Tests
-│   ├── __init__.py
-│   ├── test_api.py
-│   ├── test_data.py
-│   └── test_model.py
-├── .gitignore
-├── .pre-commit-config.yaml
-├── LICENSE
-├── pyproject.toml            # Python project file
-├── README.md                 # Project README
-├── requirements.txt          # Project requirements
-├── requirements_dev.txt      # Development requirements
-└── tasks.py                  # Project tasks
-```
+### What Frameworks Will We Use?
+We intend to use several frameworks that will simplify our work from the development and the MLOps perspective.
+For the package management, we intend to use 'uv'.
+We are using cookiecutter and the template provide to us to generate the project repository. 
+We will use git for version control.
+We will use Docker for containerization to ensure that the project runs on the 'same' system.
+We will use hydra for the management of configurations.
+We will use pytorch profiling for profiling the code. 
+For logging we will use loguru.
+Finally, we intend to use wandb for tracing our runs.
+
+### What data are you going to run on (initially, may change)
+The data we are going to use (initially) is comprised of segmented images of human scleras. 
+There are 110 people with 2 identities per person (each identity mapping to a person's eye). Each identity (person's eye) has on average 4 images from different angles. There are around 3704 images in the dataset. 
+
+!Important! - this project does not understake the parsing of images with human eyes into segmented images. 
 
 
-Created using [mlops_template](https://github.com/SkafteNicki/mlops_template),
-a [cookiecutter template](https://github.com/cookiecutter/cookiecutter) for getting
-started with Machine Learning Operations (MLOps).
+### What models do you expect to use
+We are going to use Convolutional Neural Networks (CNNs) for image classification.
