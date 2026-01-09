@@ -41,3 +41,4 @@ There are 110 people with 2 identities per person (each identity mapping to a pe
 
 ### What models do you expect to use
 We are going to use Convolutional Neural Networks (CNNs) for image classification.
+We are starting out with SqueezeNet and itterate from that, using more modern models.
