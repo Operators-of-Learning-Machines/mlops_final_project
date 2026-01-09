@@ -7,7 +7,7 @@ Amalie Sommer Thomsen s200655
 
 Oskar Kocjancic 253070
 
-Andrei Soldan, s243873
+Andrei Soldan s243873
 
 ### Project Goal
 The goal of the project is to identify a person's identity based on segmented images of their scleras (the white part of the eye). 
@@ -41,4 +41,5 @@ There are 110 people with 2 identities per person (each identity mapping to a pe
 
 ### What models do you expect to use
 We are going to use Convolutional Neural Networks (CNNs) for image classification.
+
 We are starting out with SqueezeNet and itterate from that, using more modern models.
