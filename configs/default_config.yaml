@@ -1,4 +1,5 @@
 defaults:
+  - _self_
   - model: squeezenet
   - optimizer: rms
 
@@ -11,5 +12,5 @@ no_train: False
 gaze_direction: a
 saving_period: -1
 model_save_path: models/model
-model_load_path: None
-transfer_learning_model_path: None
+model_load_path: null
+transfer_learning_model_path: null
