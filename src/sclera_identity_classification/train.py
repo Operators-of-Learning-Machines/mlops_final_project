@@ -1,16 +1,15 @@
-import argparse
 import time
-import numpy as np
 import torch
-from torch import nn, optim
-from torch.utils.data import DataLoader, random_split, DataLoader
+import wandb
+from torch import nn
+from torch.utils.data import DataLoader, random_split
 from torchvision import transforms
-from squeezenet import SqueezeNet
-from sclera_dataset import ScleraDataset
-from torcheval.metrics import MulticlassAUROC
-import os
 import hydra
 from hydra.utils import instantiate
+from omegaconf import OmegaConf
+
+from sclera_dataset import ScleraDataset
+from torcheval.metrics import MulticlassAUROC
 
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -36,6 +35,7 @@ def prepare_data(config):
 
 
     dataset = ScleraDataset(csv_file="./data/labels.csv", root_dir="data", transform=base_transform, gaze_direction=config.gaze_direction)
+
     # Define the sizes for each subset
     total_size = len(dataset)
     train_size = int(0.7 * total_size)  # 70% for training
@@ -69,7 +69,7 @@ def init_net(config):
 
 
 
-def validate(net, data_loader, device, classes=220):
+def validate(net, data_loader, classes=220):
     metric = MulticlassAUROC(num_classes=classes, average="macro").to(device)
     net.eval()
     with torch.no_grad():
@@ -90,7 +90,7 @@ def train(config, net, train_loader, val_loader):
     losses = []
 
     try:
-        for epoch in range(n_epochs):
+        for epoch in range(config.epochs):
             start_time = time.time()
             net.train()
             epoch_loss = 0
@@ -119,7 +119,15 @@ def train(config, net, train_loader, val_loader):
 
 
             # validate
-            auc = validate(net, val_loader, device=device)
+            auc = validate(net, val_loader, config.num_classes)
+
+            wandb.log({
+                "epoch": epoch,
+                "train/loss": epoch_loss,
+                "val/auc": auc.item(),
+                "lr": optimizer.param_groups[0]["lr"],
+            })
+
             print("epoch: {:3d} | lr: {:} | epoch_loss: {:7.5f} | val_auc: {:7.5f} | time: {:.2f}".format(epoch, lrs[-1], losses[-1].item() / config.batch_size, auc.item(), time.time() - start_time))
 
             if config.saving_period > 0 and config.model_save_path is not None and epoch % config.saving_period == 0:
@@ -133,6 +141,15 @@ def train(config, net, train_loader, val_loader):
 
 @hydra.main(version_base=None, config_path='../../configs', config_name='default_config')
 def main(config):
+
+    print(f"Running on {device}")
+
+    wandb.init(
+        project=config.wandb.project,
+        mode=config.wandb.mode,
+        config=OmegaConf.to_container(config, resolve=True),
+    )
+
     # Prepare the data:
     train_loader, val_loader, test_loader = prepare_data(config)
 
@@ -140,34 +157,23 @@ def main(config):
     net = init_net(config)
     # print('Net output: ', net)
 
+    wandb.watch(net, log="gradients", log_freq=100)
+
     # Train model:
     net, losses = train(config, net=net, train_loader=train_loader, val_loader=val_loader)
 
     # Save trained model:
     torch.save(net, config.model_save_path + ".pth")
+    wandb.save(config.model_save_path)
 
-    test_auc = validate(net, test_loader, device=device)
+    test_auc = validate(net, test_loader)
     print("test val_auc: {:7.5f}".format(test_auc.item()))
+
+    wandb.log({"test/auc": test_auc.item()})
+    wandb.finish()
 
     return net, test_loader, losses
 
-    wandb.watch(net, log="gradients", log_freq=100)
-
-    train(net, train_loader=train_loader, val_loader=val_loader, device=device, args=args)
-
-    torch.save(net, args.model_save_path + ".pth")
-
-    wandb.save(args.model_save_path)
-
-    test_auc = validate(net, test_loader, device=device)
-
-    print("test val_auc: {:7.5f}".format(test_auc.item()))
-    wandb.finish()
-
 
 if __name__ == "__main__":
-    net, test_loader, losses = main()
-
-
-# test_auc = validate(net, test_loader)
-# print("test val_auc: {:7.5f}".format(test_auc.item()))
+    main()
