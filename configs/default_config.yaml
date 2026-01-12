@@ -5,7 +5,7 @@ defaults:
 
 
 epochs: 25
-batch_size: 96
+batch_size: 24
 channels: 3
 pretrained: False
 no_train: False

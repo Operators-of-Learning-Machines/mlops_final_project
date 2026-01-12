@@ -62,7 +62,7 @@ def init_net(config):
         except FileNotFoundError:
             print('File not found')
     else:
-        net = instantiate(config.model, out_channels=config.channels)
+        net = instantiate(config.model)
         net.to(device)
         print(f"Total paramters: {sum([p.numel() for p in net.parameters()])}")
         return net
@@ -132,7 +132,7 @@ def main(config):
 
     # Initialize the model/network:
     net = init_net(config)
-    print('Net output: ', net)
+    # print('Net output: ', net)
 
     # Train model:
     net, losses = train(config, net=net, train_loader=train_loader, val_loader=val_loader)
