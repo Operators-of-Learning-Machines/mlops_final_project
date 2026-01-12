@@ -50,7 +50,7 @@ def train(net, train_loader, val_loader, device, args):
 
 
             # validate
-            auc = validate(net, val_loader)
+            auc = validate(net, val_loader, device=device)
             print("epoch: {:3d} | lr: {:} | epoch_loss: {:7.5f} | val_auc: {:7.5f} | time: {:.2f}".format(epoch, lrs[-1], losses[-1].item() / args.batch_size, auc.item(), time.time() - start_time))
 
             wandb.log({
@@ -67,7 +67,7 @@ def train(net, train_loader, val_loader, device, args):
     return net, losses
 
 
-def validate(net, data_loader, classes=220, device="cuda"):
+def validate(net, data_loader, device, classes=220):
     metric = MulticlassAUROC(num_classes=classes, average="macro").to(device)
     net.eval()
     with torch.no_grad():
@@ -78,7 +78,7 @@ def validate(net, data_loader, classes=220, device="cuda"):
     return metric.compute()
 
 
-def main():        
+def main():
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     parser = argparse.ArgumentParser()
