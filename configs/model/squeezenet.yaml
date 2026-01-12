@@ -1,5 +1,5 @@
 #SqueezeNet Model
-_target_: src.sclera_identity_classification.squeezenet.SqueezeNet
+_target_: squeezenet.SqueezeNet
 pretrained: False
 transfer_learning_model_path: null
 out_channels: 220
