@@ -47,7 +47,11 @@ line-length = 120
 [tool.coverage.run]
 omit = ["tests/*"]
 
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
 [tool.uv.sources]
 torch = { index = "pytorch-cu128" }
 torchvision = { index = "pytorch-cu128" }
-torcheval = { index = "pytorch-cu128" }

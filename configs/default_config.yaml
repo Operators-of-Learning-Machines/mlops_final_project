@@ -2,9 +2,10 @@ defaults:
   - _self_
   - model: squeezenet
   - optimizer: rms
+  - wandb: wandb
 
 
-epochs: 2
+epochs: 1
 batch_size: 24
 channels: 3
 pretrained: False
@@ -14,3 +15,4 @@ saving_period: -1
 model_save_path: models/model
 model_load_path: null
 transfer_learning_model_path: null
+num_classes: 220
