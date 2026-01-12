@@ -69,7 +69,7 @@ def init_net(config):
 
 
 
-def validate(net, data_loader, classes=220, device="cuda"):
+def validate(net, data_loader, device, classes=220):
     metric = MulticlassAUROC(num_classes=classes, average="macro").to(device)
     net.eval()
     with torch.no_grad():
@@ -113,7 +113,7 @@ def train(config, net, train_loader, val_loader):
                 losses.append(loss)
 
             # validate
-            auc = validate(net, val_loader)
+            auc = validate(net, val_loader, device=device)
             print("epoch: {:3d} | lr: {:} | epoch_loss: {:7.5f} | val_auc: {:7.5f} | time: {:.2f}".format(epoch, lrs[-1], losses[-1].item() / config.batch_size, auc.item(), time.time() - start_time))
 
             if config.saving_period > 0 and config.model_save_path is not None and epoch % config.saving_period == 0:
@@ -140,6 +140,9 @@ def main(config):
     # Save trained model:
     torch.save(net, config.model_save_path + ".pth")
 
+    test_auc = validate(net, test_loader, device=device)
+    print("test val_auc: {:7.5f}".format(test_auc.item()))
+
     return net, test_loader, losses
 
 
@@ -147,5 +150,5 @@ if __name__ == "__main__":
     net, test_loader, losses = main()
 
 
-test_auc = validate(net, test_loader)
-print("test val_auc: {:7.5f}".format(test_auc.item()))
+# test_auc = validate(net, test_loader)
+# print("test val_auc: {:7.5f}".format(test_auc.item()))
