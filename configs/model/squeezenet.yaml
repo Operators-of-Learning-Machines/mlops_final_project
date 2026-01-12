@@ -1,0 +1,6 @@
+#SqueezeNet Model
+_target_: squeezenet.SqueezeNet
+pretrained: False
+transfer_learning_model_path: null
+out_channels: 220
+kernel_size: 1

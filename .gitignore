@@ -4,6 +4,8 @@ data
 
 models/
 
+outputs
+
 
 # test cache
 manual_test/

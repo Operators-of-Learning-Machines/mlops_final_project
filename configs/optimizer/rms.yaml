@@ -1,0 +1,5 @@
+# RMSProp Optimizer
+_target_: torch.optim.RMSprop
+lr: 1e-5
+weight_decay: 1e-3
+momentum: 0.9
