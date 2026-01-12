@@ -1,0 +1,16 @@
+defaults:
+  - _self_
+  - model: squeezenet
+  - optimizer: rms
+
+
+epochs: 2
+batch_size: 24
+channels: 3
+pretrained: False
+no_train: False
+gaze_direction: a
+saving_period: -1
+model_save_path: models/model
+model_load_path: null
+transfer_learning_model_path: null
