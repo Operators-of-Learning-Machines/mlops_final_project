@@ -5,7 +5,7 @@ data
 models/
 
 outputs
-
+wandb
 
 # test cache
 manual_test/
