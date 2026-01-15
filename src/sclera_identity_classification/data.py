@@ -1,20 +1,18 @@
-
-from torch.utils.data import Dataset
-
-import random
-from typing import Literal
-import torch
-from torch.utils.data import Dataset
-from PIL import Image
 import os
+import random
+import zipfile
+from typing import Literal
+
 import pandas as pd
 import requests
-
-
-import requests
+import torch
+from PIL import Image
+from torch.utils.data import DataLoader, Dataset, random_split
+from torchvision import transforms
 from tqdm import tqdm
-import zipfile
-import os
+
+from data import ScleraDataset
+
 
 def download_and_extract():
     url = "https://drive.usercontent.google.com/download?id=1H1bS5HXKLVv2WohhP9sqBfbqP0f4AXr5&export=download&authuser=0&confirm=t&uuid=7fac1154-8b63-4e86-b77a-c1b1bcf94517&at=ANTm3cw7hk3aCuEPArnuwUssC7J9%3A1768479815612"
@@ -27,11 +25,9 @@ def download_and_extract():
     # Streaming download with progress bar
     response = requests.get(url, stream=True)
     response.raise_for_status()
-    total_size = int(response.headers.get('content-length', 0))
+    total_size = int(response.headers.get("content-length", 0))
 
-    with open(local_filename, 'wb') as f, tqdm(
-        total=total_size, unit='B', unit_scale=True, desc="Downloading"
-    ) as bar:
+    with open(local_filename, "wb") as f, tqdm(total=total_size, unit="B", unit_scale=True, desc="Downloading") as bar:
         for chunk in response.iter_content(chunk_size=8192):
             f.write(chunk)
             bar.update(len(chunk))
@@ -39,18 +35,13 @@ def download_and_extract():
     print("Download complete. Extracting...")
 
     # Unzip into data folder
-    with zipfile.ZipFile(local_filename, 'r') as zip_ref:
+    with zipfile.ZipFile(local_filename, "r") as zip_ref:
         zip_ref.extractall(data_folder)
 
     print(f"Extraction complete. Files are in '{data_folder}/'")
 
     # Clean up the zip file
     os.remove(local_filename)
-
-
-# Example usage
-# download_and_extract()
-
 
 class ScleraDataset(Dataset):
     def __init__(self, csv_file, root_dir, transform=None, mode: Literal["single", "contrastive", "triplet"] = "single", gaze_direction: Literal["s", "l", "r", "u", "a"] = "a"):
@@ -107,7 +98,6 @@ class ScleraDataset(Dataset):
             if index not in self.label_dict:
                 self.label_dict[index] = counter
                 counter += 1
-
 
     def __len__(self):
         # return self.dataset_length
@@ -178,20 +168,55 @@ class ScleraDataset(Dataset):
             # print(e)
             return self.__getitem__(random.randint(0, self.dataset_length - 1))
 
+
+def make_dataloaders(config):
+
+    base_transform = transforms.Compose(
+        [
+            transforms.Grayscale(config.channels),
+            transforms.ToTensor(),
+            transforms.Normalize(0.5, 0.5),
+        ]
+    )
+
+    aug_transform = transforms.Compose(
+        [
+            transforms.RandomAffine(degrees=(3, 3), translate=(0.1, 0.1), scale=(1.2, 1.2), shear=5),
+            transforms.ColorJitter(brightness=0.1, contrast=0.05),
+            base_transform,
+        ]
+    )
+
+    dataset = ScleraDataset(csv_file="./data/labels.csv", root_dir="data", transform=base_transform, gaze_direction=config.gaze_direction)
+
+    # Define the sizes for each subset
+    total_size = len(dataset)
+    train_size = int(0.7 * total_size)  # 70% for training
+    val_size = int(0.15 * total_size)  # 15% for validation
+    test_size = total_size - train_size - val_size  # Remaining 15% for testing
+    train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
+    train_dataset.dataset.transform = aug_transform
+
+    print(f"Total size: {total_size}, Training size: {train_size}, Validation size: {val_size}, Test size: {test_size}")
+    train_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=True, pin_memory=True, num_workers=4, prefetch_factor=100)
+    val_loader = DataLoader(val_dataset, batch_size=config.batch_size, shuffle=False, pin_memory=True, num_workers=4, prefetch_factor=100)
+    test_loader = DataLoader(test_dataset, batch_size=config.batch_size, shuffle=False, pin_memory=True, num_workers=4, prefetch_factor=100)
+
+    return train_loader, val_loader, test_loader
+
+
 if __name__ == "__main__":
     download_and_extract()
 
-    # base_transform = transforms.Compose(
-    #     [
-    #         transforms.Grayscale(3),
-    #         transforms.ToTensor(),
-    #         transforms.Normalize(0.5, 0.5),
-    #     ]
-    # )
-    # dataset = ScleraDataset(csv_file="./data/labels.csv", root_dir="data", transform=base_transform)
+    base_transform = transforms.Compose(
+        [
+            transforms.Grayscale(3),
+            transforms.ToTensor(),
+            transforms.Normalize(0.5, 0.5),
+        ]
+    )
+    dataset = ScleraDataset(csv_file="./data/labels.csv", root_dir="data", transform=base_transform)
 
-
-
-    # image, label = dataset[0]
-    # print(f"Single item - Image shape: {list(image.shape)}, Label: {label}")
-    # print(f"Dataset length: {len(dataset)}")
+    image, label = dataset[0]
+    print(f"Single item - Image shape: {list(image.shape)}, Label: {label}")
+    print(f"Dataset length: {len(dataset)}")
