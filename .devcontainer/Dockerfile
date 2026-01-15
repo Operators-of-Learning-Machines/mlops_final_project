@@ -1,10 +1,13 @@
-FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+FROM nvidia/cuda:12.6.0-runtime-ubuntu22.04
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    git \
+RUN apt-get update && apt-get install -y \
     curl \
-    build-essential \
-    gcc \
- && rm -rf /var/lib/apt/lists/*
+    git \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /workspaces/sclera_identity_classification
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/root/.local/bin:$PATH"
+ENV UV_PYTHON=python3.12
+
+WORKDIR /workspaces/${localWorkspaceFolderBasename}
