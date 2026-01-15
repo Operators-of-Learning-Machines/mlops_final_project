@@ -2,6 +2,7 @@ import torch
 from torch import nn
 from torchvision.models import squeezenet1_1, SqueezeNet1_1_Weights
 
+
 class SqueezeNet(nn.Module):
     def __init__(self, pretrained=False, transfer_learning_model_path=None, out_channels=220, kernel_size=1):
         super(SqueezeNet, self).__init__()
@@ -16,5 +17,3 @@ class SqueezeNet(nn.Module):
         x = self.model.features(x)
         x = self.model.classifier(x)
         return torch.flatten(x, 1)
-
-
