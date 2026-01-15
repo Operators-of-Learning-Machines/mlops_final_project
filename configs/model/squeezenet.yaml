@@ -1,5 +1,5 @@
 #SqueezeNet Model
-_target_: squeezenet.SqueezeNet
+_target_: architectures.squeezenet.SqueezeNet
 pretrained: False
 transfer_learning_model_path: null
 out_channels: 220
