@@ -1,0 +1,97 @@
+_wandb:
+    value:
+        cli_version: 0.23.1
+        e:
+            qcfbg5igrhmgor9p2sqglgja69lbujq6:
+                codePath: src\sclera_identity_classification\train.py
+                codePathLocal: src\sclera_identity_classification\train.py
+                cpu_count: 8
+                cpu_count_logical: 16
+                cudaVersion: "12.6"
+                disk:
+                    /:
+                        total: "997001072640"
+                        used: "886166925312"
+                email: s243873@dtu.dk
+                executable: C:\Users\asold\DTU_Local\MLOps\mlops_final_project\.venv\Scripts\python.exe
+                git:
+                    commit: 968ffa01000e3cf528b3f815c61896451a7c84cf
+                    remote: https://github.com/Operators-of-Learning-Machines/mlops_final_project.git
+                gpu: NVIDIA GeForce RTX 3050 Laptop GPU
+                gpu_count: 1
+                gpu_nvidia:
+                    - architecture: Ampere
+                      cudaCores: 2048
+                      memoryTotal: "4294967296"
+                      name: NVIDIA GeForce RTX 3050 Laptop GPU
+                      uuid: GPU-e2cddf15-3aa2-a260-6c92-fa4ad8b56e51
+                host: Andrei
+                memory:
+                    total: "16370769920"
+                os: Windows-11-10.0.26100-SP0
+                program: C:\Users\asold\DTU_Local\MLOps\mlops_final_project\src\sclera_identity_classification\train.py
+                python: CPython 3.12.10
+                root: C:\Users\asold\DTU_Local\MLOps\mlops_final_project
+                startedAt: "2026-01-12T20:43:07.800048Z"
+                writerId: qcfbg5igrhmgor9p2sqglgja69lbujq6
+        m: []
+        python_version: 3.12.10
+        t:
+            "1":
+                - 1
+                - 41
+                - 50
+            "2":
+                - 1
+                - 41
+                - 50
+            "3":
+                - 1
+                - 2
+                - 3
+                - 16
+            "4": 3.12.10
+            "5": 0.23.1
+            "8":
+                - 3
+            "12": 0.23.1
+            "13": windows-amd64
+batch_size:
+    value: 24
+channels:
+    value: 3
+epochs:
+    value: 1
+gaze_direction:
+    value: a
+model:
+    value:
+        _target_: squeezenet.SqueezeNet
+        kernel_size: 1
+        out_channels: 220
+        pretrained: false
+        transfer_learning_model_path: null
+model_load_path:
+    value: null
+model_save_path:
+    value: models/model
+no_train:
+    value: false
+num_classes:
+    value: 220
+optimizer:
+    value:
+        _target_: torch.optim.RMSprop
+        lr: 1e-05
+        momentum: 0.9
+        weight_decay: 0.001
+pretrained:
+    value: false
+saving_period:
+    value: -1
+transfer_learning_model_path:
+    value: null
+wandb:
+    value:
+        mode: online
+        project: sclera-identity-classification
