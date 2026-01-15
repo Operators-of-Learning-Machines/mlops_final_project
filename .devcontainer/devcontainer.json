@@ -5,6 +5,10 @@
 
   // ✅ Always points to the mounted repo folder name
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "runArgs": [
+    "--gpus=all",
+    "--shm-size=2g"
+  ],
 
   "postCreateCommand": "bash .devcontainer/post_create.sh",
 
