@@ -88,6 +88,7 @@ def train(config, net, train_loader, val_loader):
 
     lrs = []
     losses = []
+    batch = 1
 
     try:
         for epoch in range(config.epochs):
@@ -106,26 +107,22 @@ def train(config, net, train_loader, val_loader):
                 # Compute loss
                 loss = loss_function(out, target)
                 epoch_loss += loss.item()
+                wandb.log(
+                    {"batch": batch, "train/batch_loss": loss.item()}
+                )
+                batch += 1
 
                 # Backward pass
                 loss.backward()
                 optimizer.step()
                 losses.append(loss)
 
-            wandb.log({
-                "train/loss": loss.item(),
-                "epoch": epoch,
-            })
-
-
             # validate
             auc = validate(net, val_loader, config.model.out_channels)
 
             wandb.log({
-                "epoch": epoch,
-                "train/loss": epoch_loss,
-                "val/auc": auc.item(),
-                "lr": optimizer.param_groups[0]["lr"],
+                "epoch": epoch + 1, "train/epoch_loss": epoch_loss,
+                "epoch": epoch + 1,"validation/epoch_auc": auc.item(),
             })
 
             print("epoch: {:3d} | lr: {:} | epoch_loss: {:7.5f} | val_auc: {:7.5f} | time: {:.2f}".format(epoch, lrs[-1], losses[-1].item() / config.batch_size, auc.item(), time.time() - start_time))
@@ -150,6 +147,11 @@ def main(config):
         config=OmegaConf.to_container(config, resolve=True),
     )
 
+    # # Defining different steps for the wandb charts so they are not shared
+    wandb.define_metric("train/batch_*", step_metric="batch")
+    wandb.define_metric("train/epoch_*", step_metric="epoch")
+    wandb.define_metric("validation/epoch_*", step_metric="epoch")
+
     # Prepare the data:
     train_loader, val_loader, test_loader = prepare_data(config)
 
@@ -162,14 +164,19 @@ def main(config):
     # Train model:
     net, losses = train(config, net=net, train_loader=train_loader, val_loader=val_loader)
 
+    test_auc = validate(net, test_loader)
+    wandb.run.summary["test/auc"] = float(test_auc.item())
+
     # Save trained model:
     torch.save(net, config.model_save_path + ".pth")
-    wandb.save(config.model_save_path)
-
-    test_auc = validate(net, test_loader)
-    print("test val_auc: {:7.5f}".format(test_auc.item()))
-
-    wandb.log({"test/auc": test_auc.item()})
+    artifact = wandb.Artifact(
+        name = "sclera-identity-classification-model",
+        type = "model",
+        description = "A model trained to identify individuals based on sclera images",
+        metadata = {"auc": float(test_auc.item())}
+    )
+    artifact.add_file(config.model_save_path + ".pth")
+    wandb.log_artifact(artifact)
     wandb.finish()
 
     return net, test_loader, losses
