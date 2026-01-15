@@ -119,7 +119,7 @@ def train(config, net, train_loader, val_loader):
 
 
             # validate
-            auc = validate(net, val_loader, config.num_classes)
+            auc = validate(net, val_loader, config.model.out_channels)
 
             wandb.log({
                 "epoch": epoch,

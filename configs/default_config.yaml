@@ -1,18 +1,22 @@
 defaults:
   - _self_
-  - model: squeezenet
-  - optimizer: rms
+  - model: null
+  - optimizer: null
+  - experiment: exp_1 # to change default value, add e.g. experiment=exp_2 to the run cmd
   - wandb: wandb
 
+# disables hydra logging, because we use wandb for logs...
+  - override hydra/hydra_logging: disabled
+  - override hydra/job_logging: disabled
 
 epochs: 1
 batch_size: 24
+
+
+# These values are static and should not be changed...:
 channels: 3
 pretrained: False
-no_train: False
 gaze_direction: a
 saving_period: -1
 model_save_path: models/model
 model_load_path: null
-transfer_learning_model_path: null
-num_classes: 220
