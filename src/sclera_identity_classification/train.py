@@ -8,7 +8,7 @@ import hydra
 from hydra.utils import instantiate
 from omegaconf import OmegaConf
 
-from sclera_identity_classification.sclera_dataset import ScleraDataset
+from data import ScleraDataset
 from torcheval.metrics import MulticlassAUROC
 
 
@@ -45,9 +45,9 @@ def prepare_data(config):
     train_dataset.dataset.transform = aug_transform
 
     print(f"Total size: {total_size}, Training size: {train_size}, Validation size: {val_size}, Test size: {test_size}")
-    train_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=True, pin_memory=True, num_workers=4, prefetch_factor=10)
-    val_loader = DataLoader(val_dataset, batch_size=config.batch_size, shuffle=False, pin_memory=True, num_workers=4, prefetch_factor=10)
-    test_loader = DataLoader(test_dataset, batch_size=config.batch_size, shuffle=False, pin_memory=True, num_workers=4, prefetch_factor=10)
+    train_loader = DataLoader(train_dataset, batch_size=config.batch_size, shuffle=True, pin_memory=True, num_workers=4, prefetch_factor=100)
+    val_loader = DataLoader(val_dataset, batch_size=config.batch_size, shuffle=False, pin_memory=True, num_workers=4, prefetch_factor=100)
+    test_loader = DataLoader(test_dataset, batch_size=config.batch_size, shuffle=False, pin_memory=True, num_workers=4, prefetch_factor=100)
 
     return train_loader, val_loader, test_loader
 
