@@ -1,0 +1,2 @@
+project: sclera-identity-classification
+mode: online   # online | offline | disabled
