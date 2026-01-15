@@ -8,7 +8,7 @@ import hydra
 from hydra.utils import instantiate
 from omegaconf import OmegaConf
 
-from sclera_dataset import ScleraDataset
+from data import ScleraDataset
 from torcheval.metrics import MulticlassAUROC
 
 
@@ -118,7 +118,7 @@ def train(config, net, train_loader, val_loader):
                 losses.append(loss)
 
             # validate
-            auc = validate(net, val_loader, config.num_classes)
+            auc = validate(net, val_loader, config.model.out_channels)
 
             wandb.log({
                 "epoch": epoch + 1, "train/epoch_loss": epoch_loss,

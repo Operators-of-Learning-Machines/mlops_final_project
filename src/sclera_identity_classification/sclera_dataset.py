@@ -50,10 +50,6 @@ class ScleraDataset(Dataset):
         self.frame = new_frame 
         
         self.dataset_length = sum(len(items) for items in self.grouped_by_label_items_dict.values())
-        # if self.mode == "triplet" or self.mode == "contrastive":
-        #     for i in self.grouped_by_label_items_dict:
-        #         for j in range(comb(len(self.grouped_by_label_items_dict[j]), 2)):
-        #             self.frame.add()
 
         # build the dictionary
         self.label_dict = {}
@@ -67,7 +63,6 @@ class ScleraDataset(Dataset):
 
 
     def __len__(self):
-        # return self.dataset_length
         return self.frame.shape[0]
 
     def get_single_item(self, id):
@@ -90,8 +85,6 @@ class ScleraDataset(Dataset):
         image = Image.open(img_name).convert("RGB")
         if self.transform:
             image = self.transform(image)
-        # print("postive", img_name)
-        # self.grouped_by_label_items_dict[anchor_id].remove(img_name)
 
         return image
 
@@ -107,7 +100,6 @@ class ScleraDataset(Dataset):
         if not img_name_candidates:  # Check if the candidates list is empty
             raise IndexError("No valid candidates found for negative sample.")
         img_name = random.choice(img_name_candidates)
-        # print("negative", img_name)
         image = Image.open(img_name).convert("RGB")
         if self.transform:
             image = self.transform(image)
@@ -132,5 +124,4 @@ class ScleraDataset(Dataset):
                 image2 = self.get_positive_item(index) if label == 1 else self.get_negative_item(index)
                 return image1, image2, torch.tensor(label, dtype=torch.long)
         except IndexError as e:
-            # print(e)
             return self.__getitem__(random.randint(0, self.dataset_length - 1))
