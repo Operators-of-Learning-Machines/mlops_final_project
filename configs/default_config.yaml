@@ -5,7 +5,7 @@ defaults:
   - wandb: wandb
 
 
-epochs: 5
+epochs: 1
 batch_size: 24
 channels: 3
 pretrained: False
