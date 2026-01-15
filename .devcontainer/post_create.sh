@@ -9,6 +9,6 @@ if ! command -v uv >/dev/null 2>&1; then
   export PATH="$HOME/.local/bin:$PATH"
 fi
 
-uv sync --group dev || uv sync --extra dev
+uv sync --frozen --group dev || uv sync --extra dev
 
 uv run pre-commit install --install-hooks

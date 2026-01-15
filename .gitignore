@@ -5,7 +5,12 @@ data
 models/
 
 outputs
+
 wandb
+reports
+docs
+
+
 
 # test cache
 manual_test/
@@ -151,6 +156,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+wandb/
 
 # Spyder project settings
 .spyderproject

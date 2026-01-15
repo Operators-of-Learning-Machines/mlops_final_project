@@ -43,3 +43,10 @@ There are 110 people with 2 identities per person (each identity mapping to a pe
 We are going to use Convolutional Neural Networks (CNNs) for image classification.
 
 We are starting out with SqueezeNet and itterate from that, using more modern models.
+
+
+
+### To build the docker image with a GPU-compatible base image:
+docker build -f .\dockerfiles\train.dockerfile  -t sclera-train:gpu .
+### To run the docker image:
+docker run --rm --gpus all -e WANDB_API_KEY=your_real_api_key_here --shm-size=2g sclera-train:gpu
