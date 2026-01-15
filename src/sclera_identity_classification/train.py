@@ -8,7 +8,7 @@ import hydra
 from hydra.utils import instantiate
 from omegaconf import OmegaConf
 
-from sclera_dataset import ScleraDataset
+from data import ScleraDataset
 from torcheval.metrics import MulticlassAUROC
 
 
