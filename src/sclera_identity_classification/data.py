@@ -11,9 +11,6 @@ from torch.utils.data import DataLoader, Dataset, random_split
 from torchvision import transforms
 from tqdm import tqdm
 
-from data import ScleraDataset
-
-
 def download_and_extract():
     url = "https://drive.usercontent.google.com/download?id=1H1bS5HXKLVv2WohhP9sqBfbqP0f4AXr5&export=download&authuser=0&confirm=t&uuid=7fac1154-8b63-4e86-b77a-c1b1bcf94517&at=ANTm3cw7hk3aCuEPArnuwUssC7J9%3A1768479815612"
     local_filename = "downloaded_file.zip"
