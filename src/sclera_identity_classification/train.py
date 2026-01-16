@@ -143,12 +143,17 @@ def train(config, net, train_loader, val_loader):
 def main(config):
 
     print(f"Running on {device}")
+    print(f"Running the following exepriment: {config.experiment_name}")
+
 
     wandb.init(
         project=config.wandb.project,
         mode=config.wandb.mode,
         config=OmegaConf.to_container(config, resolve=True),
     )
+
+    wandb.log({"experiment": config.experiment_name})
+
 
     # Prepare the data:
     train_loader, val_loader, test_loader = prepare_data(config)
