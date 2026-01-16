@@ -1,5 +1,4 @@
 import os
-
 import pytest
 from sclera_identity_classification.data import download_and_extract, ScleraDataset
 from tests import _PATH_DATA
