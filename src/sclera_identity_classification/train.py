@@ -5,8 +5,8 @@ import hydra
 from hydra.utils import instantiate
 from omegaconf import OmegaConf
 from torch import nn
-from data import make_dataloaders
-from evaluate import evaluate
+from sclera_identity_classification.data import make_dataloaders
+from sclera_identity_classification.evaluate import evaluate
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -51,7 +51,6 @@ def train(config, net, train_loader, val_loader):
                 {
                     "epoch": epoch + 1,
                     "train/epoch_loss": epoch_loss,
-                    "epoch": epoch + 1,
                     "validation/epoch_auc": auc.item(),
                 }
             )
@@ -77,8 +76,6 @@ def init_net(config):
 def main(config):
 
     print(f"Running on {device}")
-    print(f"Running the following exepriment: {config.experiment_name}")
-
 
     wandb.init(
         project=config.wandb.project,
