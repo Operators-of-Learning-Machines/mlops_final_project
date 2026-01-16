@@ -47,7 +47,16 @@ dev = [
 line-length = 120
 
 [tool.coverage.run]
-omit = ["tests/*"]
+omit = ["tests/*", 
+        "/tmp/*",
+        "*/_remote_module_non_scriptable.py"
+]
+
+[tool.pytest.ini_options]
+filterwarnings = [
+  "ignore:No source for code.*"
+]
+
 
 [[tool.uv.index]]
 name = "pytorch-cu128"
