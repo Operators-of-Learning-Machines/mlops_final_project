@@ -77,6 +77,8 @@ def init_net(config):
 def main(config):
 
     print(f"Running on {device}")
+    print(f"Running the following exepriment: {config.experiment_name}")
+
 
     wandb.init(
         project=config.wandb.project,
