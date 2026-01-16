@@ -12,7 +12,6 @@ from torchvision import transforms
 from tqdm import tqdm
 
 def download_and_extract():
-    number = 656
     url = "https://drive.usercontent.google.com/download?id=1H1bS5HXKLVv2WohhP9sqBfbqP0f4AXr5&export=download&authuser=0&confirm=t&uuid=7fac1154-8b63-4e86-b77a-c1b1bcf94517&at=ANTm3cw7hk3aCuEPArnuwUssC7J9%3A1768479815612"
     local_filename = "downloaded_file.zip"
     data_folder = "."
@@ -162,8 +161,7 @@ class ScleraDataset(Dataset):
                 label = 1 if random.random() > 0.5 else -1
                 image2 = self.get_positive_item(index) if label == 1 else self.get_negative_item(index)
                 return image1, image2, torch.tensor(label, dtype=torch.long)
-        except IndexError as e:
-            # print(e)
+        except IndexError:
             return self.__getitem__(random.randint(0, self.dataset_length - 1))
 
 
