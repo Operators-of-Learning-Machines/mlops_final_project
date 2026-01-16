@@ -6,37 +6,45 @@ WINDOWS = os.name == "nt"
 PROJECT_NAME = "sclera_identity_classification"
 PYTHON_VERSION = "3.12"
 
+
 # Project commands
 @task
 def preprocess_data(ctx: Context) -> None:
     """Preprocess data."""
     ctx.run(f"uv run src/{PROJECT_NAME}/data.py data/raw data/processed", echo=True, pty=not WINDOWS)
 
-@task
-def train(ctx: Context) -> None:
+@task(
+    help={
+        "experiment": "Hydra experiment to run (e.g. exp_1, exp_2)"
+    }
+)
+def train(ctx: Context, experiment="exp_1") -> None:
     """Train model."""
-    ctx.run(f"uv run src/{PROJECT_NAME}/train.py", echo=True, pty=not WINDOWS)
+    ctx.run(f"uv run src/{PROJECT_NAME}/train.py experiment={experiment}", echo=True, pty=not WINDOWS)
 
 @task
 def test(ctx: Context) -> None:
     """Run tests."""
     ctx.run("uv run pytest tests/", echo=True, pty=not WINDOWS)
-    # ctx.run("uv run coverage run -m pytest tests/", echo=True, pty=not WINDOWS)
-    # ctx.run("uv run coverage report -m -i", echo=True, pty=not WINDOWS)
 
 @task
 def docker_build(ctx: Context, progress: str = "plain") -> None:
     """Build docker images."""
     ctx.run(
-        f"docker build -t train:latest . -f dockerfiles/train.dockerfile --progress={progress}",
+        f"docker build "
+        f"-f dockerfiles/train.dockerfile "
+        f"-t sclera-train:gpu "
+        f"--progress={progress} "
+        f".",
         echo=True,
-        pty=not WINDOWS
+        pty=not WINDOWS,
     )
-    ctx.run(
-        f"docker build -t api:latest . -f dockerfiles/api.dockerfile --progress={progress}",
-        echo=True,
-        pty=not WINDOWS
-    )
+    # ctx.run(
+    #     f"docker build -t api:latest . -f dockerfiles/api.dockerfile --progress={progress}",
+    #     echo=True,
+    #     pty=not WINDOWS
+    # )
+
 
 # Documentation commands
 @task

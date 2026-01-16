@@ -161,8 +161,7 @@ class ScleraDataset(Dataset):
                 label = 1 if random.random() > 0.5 else -1
                 image2 = self.get_positive_item(index) if label == 1 else self.get_negative_item(index)
                 return image1, image2, torch.tensor(label, dtype=torch.long)
-        except IndexError as e:
-            # print(e)
+        except IndexError:
             return self.__getitem__(random.randint(0, self.dataset_length - 1))
 
 

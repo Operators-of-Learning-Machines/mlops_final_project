@@ -45,8 +45,16 @@ We are going to use Convolutional Neural Networks (CNNs) for image classificatio
 We are starting out with SqueezeNet and itterate from that, using more modern models.
 
 
+## Just for running the training script
+`uv run invoke train --experiment=exp_{number}` 
 
-### To build the docker image with a GPU-compatible base image:
-docker build -f .\dockerfiles\train.dockerfile  -t sclera-train:gpu .
-### To run the docker image:
-docker run --rm --gpus all -e WANDB_API_KEY=your_real_api_key_here --shm-size=2g sclera-train:gpu
+
+## To build the docker image with a GPU-compatible base image:
+- `docker build -f .\dockerfiles\train.dockerfile  -t sclera-train:gpu .`
+
+Or run 
+
+- `uv run invoke docker-build --progress={auto/tty}`
+
+## To run the docker image:
+`docker run --rm --gpus all -e WANDB_API_KEY=your_real_api_key_here --shm-size=2g sclera-train:gpu`
