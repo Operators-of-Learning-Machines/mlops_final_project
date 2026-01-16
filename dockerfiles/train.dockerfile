@@ -24,7 +24,6 @@ COPY README.md README.md
 COPY configs configs/
 COPY models models/
 COPY tests tests/
-COPY data data/
 
 
 COPY src src/
