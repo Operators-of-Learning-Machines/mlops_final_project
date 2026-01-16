@@ -5,8 +5,8 @@ import hydra
 from hydra.utils import instantiate
 from omegaconf import OmegaConf
 from torch import nn
-from data import make_dataloaders
-from evaluate import evaluate
+from sclera_identity_classification.data import make_dataloaders
+from sclera_identity_classification.evaluate import evaluate
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
