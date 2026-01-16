@@ -105,7 +105,7 @@ def main(config):
     wandb.run.summary["test/auc"] = float(test_auc.item())
 
     # Save trained model:
-    torch.save(net, config.model_save_path + ".pth")
+    torch.save(net.state_dict(), config.model_save_path + ".pth")
     artifact = wandb.Artifact(name="sclera-identity-classification-model", type="model", description="A model trained to identify individuals based on sclera images", metadata={"auc": float(test_auc.item())})
     artifact.add_file(config.model_save_path + ".pth")
     wandb.log_artifact(artifact)

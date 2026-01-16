@@ -27,7 +27,7 @@ async def sclera_model(data: UploadFile = File()):
         # Read uploaded image:
         img = await data.read()
         pil_img = Image.open(io.BytesIO(img))
-        
+
         # Transform to correct format before forwarding to model:
         base_transform = transforms.Compose(
             [
@@ -37,22 +37,18 @@ async def sclera_model(data: UploadFile = File()):
             ]
         )
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        
+
         input_img = base_transform(pil_img).to(device)
         input_img = input_img.unsqueeze(0)
-        print("before loading the model!!!")
-        print("not allowlisted functions/classes: ", torch.serialization.get_unsafe_globals_in_checkpoint(MODEL_PATH))
 
-        # Load the model:
-        #net = torch.load(MODEL_PATH, weights_only=False)
-        net = SqueezeNet(transfer_learning_model_path=MODEL_PATH)
+        net = SqueezeNet(transfer_learning_model_path=MODEL_PATH, out_channels=220)
         net.to(device)
-        
-        with torch.inference_mode():            
+
+        with torch.inference_mode():
             output = net(input_img)
             # Format and send a response:
             response = {
-                "result": output,
+                "result": output.flatten().tolist(),
                 "status": HTTPStatus.OK
             }
             return response

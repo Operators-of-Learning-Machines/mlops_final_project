@@ -1,5 +1,5 @@
 # @package _global_
-defaults: 
+defaults:
   - override /model: squeezenet
   - override /optimizer: rms
 
@@ -8,7 +8,7 @@ defaults:
 #batch_size: 24
 
 # Set variables for specific sub-config files (e.g. rms.yaml):
-#optimizer: 
+#optimizer:
 #  lr: 1e-3
-#model: 
-#  pretrained: True
+# model:
+#  transfer_learning_model_path: models/model.pth
