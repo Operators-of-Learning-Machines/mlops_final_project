@@ -51,7 +51,6 @@ def train(config, net, train_loader, val_loader):
                 {
                     "epoch": epoch + 1,
                     "train/epoch_loss": epoch_loss,
-                    "epoch": epoch + 1,
                     "validation/epoch_auc": auc.item(),
                 }
             )

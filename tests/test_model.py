@@ -1,11 +1,9 @@
-import types
 import torch
 import pytest
+import wandb
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
-import wandb
 from sclera_identity_classification.train import train, init_net
-from hydra import initialize, compose
 from omegaconf import OmegaConf
 
 
@@ -88,4 +86,4 @@ def test_train_runs(make_dummy_config, dummy_dataloaders):
 
     assert isinstance(trained_net, nn.Module)
     assert len(losses) > 0
-    assert all(torch.is_tensor(l) for l in losses)
+    assert all(torch.is_tensor(ls) for ls in losses)

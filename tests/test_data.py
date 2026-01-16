@@ -1,7 +1,5 @@
 import os
-
 import pytest
-import requests
 from sclera_identity_classification.data import download_and_extract, ScleraDataset
 from tests import _PATH_DATA
 from torchvision import transforms

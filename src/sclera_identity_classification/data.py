@@ -11,6 +11,7 @@ from torch.utils.data import DataLoader, Dataset, random_split
 from torchvision import transforms
 from tqdm import tqdm
 
+
 def download_and_extract():
     url = "https://drive.usercontent.google.com/download?id=1H1bS5HXKLVv2WohhP9sqBfbqP0f4AXr5&export=download&authuser=0&confirm=t&uuid=7fac1154-8b63-4e86-b77a-c1b1bcf94517&at=ANTm3cw7hk3aCuEPArnuwUssC7J9%3A1768479815612"
     local_filename = "downloaded_file.zip"
@@ -40,6 +41,7 @@ def download_and_extract():
     # Clean up the zip file
     os.remove(local_filename)
 
+
 class ScleraDataset(Dataset):
     def __init__(self, csv_file, root_dir, transform=None, mode: Literal["single", "contrastive", "triplet"] = "single", gaze_direction: Literal["s", "l", "r", "u", "a"] = "a"):
         """
@@ -55,7 +57,7 @@ class ScleraDataset(Dataset):
             Optional transform to be applied on a sample.
         mode : Literal["single", "contrastive", "triplet"], optional
             The mode to load the dataset in. Default is "single".
-        gaze_direction : Literal["s", "l", "r", "u", "a"], optional
+        gaze_direction : Literal["s", "l", "r", `"u", "a"], optional
             The gaze direction to filter the dataset by. Default is "a" (all).
 
         """
@@ -161,8 +163,7 @@ class ScleraDataset(Dataset):
                 label = 1 if random.random() > 0.5 else -1
                 image2 = self.get_positive_item(index) if label == 1 else self.get_negative_item(index)
                 return image1, image2, torch.tensor(label, dtype=torch.long)
-        except IndexError as e:
-            # print(e)
+        except IndexError:
             return self.__getitem__(random.randint(0, self.dataset_length - 1))
 
 
