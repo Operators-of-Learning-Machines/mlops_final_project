@@ -1,10 +1,8 @@
 import os
 import random
-import zipfile
 from typing import Literal
 
 import pandas as pd
-import requests
 import torch
 from PIL import Image
 from torch.utils.data import DataLoader, Dataset, random_split
@@ -41,6 +39,7 @@ def download_and_extract(
 
     client = storage.Client()
     bucket = client.bucket(bucket_name)
+    print(f"Created the bucket object {bucket}")
 
     blobs = list(client.list_blobs(bucket_name, prefix=gcs_prefix))
     if not blobs:
