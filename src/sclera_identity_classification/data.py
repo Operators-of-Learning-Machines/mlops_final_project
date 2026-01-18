@@ -10,36 +10,57 @@ from PIL import Image
 from torch.utils.data import DataLoader, Dataset, random_split
 from torchvision import transforms
 from tqdm import tqdm
+from google.cloud import storage
+
+def ensure_data_present(
+    data_root: str = "data",
+    labels_file: str = "data/labels.csv",
+):
+    if os.path.exists(data_root) and os.path.exists(labels_file):
+        print("Data already present. Skipping download.")
+        return
+
+    print("Data not found locally. Downloading from GCS...")
+    download_and_extract()
 
 
-def download_and_extract():
-    url = "https://drive.usercontent.google.com/download?id=1H1bS5HXKLVv2WohhP9sqBfbqP0f4AXr5&export=download&authuser=0&confirm=t&uuid=7fac1154-8b63-4e86-b77a-c1b1bcf94517&at=ANTm3cw7hk3aCuEPArnuwUssC7J9%3A1768479815612"
-    local_filename = "downloaded_file.zip"
-    data_folder = "."
+def download_and_extract(
+    bucket_name: str = "sclera_identity_dataset",
+    gcs_prefix: str = "data/",
+    local_root: str = "data",
+):
+    """
+    Downloads gs://bucket_name/gcs_prefix/** into local_root/**
 
-    # Create data folder if it doesn't exist
-    os.makedirs(data_folder, exist_ok=True)
+    Example:
+        gs://my-bucket/data/cats/img1.jpg
+        -> ./data/cats/img1.jpg
+    """
 
-    # Streaming download with progress bar
-    response = requests.get(url, stream=True)
-    response.raise_for_status()
-    total_size = int(response.headers.get("content-length", 0))
+    os.makedirs(local_root, exist_ok=True)
 
-    with open(local_filename, "wb") as f, tqdm(total=total_size, unit="B", unit_scale=True, desc="Downloading") as bar:
-        for chunk in response.iter_content(chunk_size=8192):
-            f.write(chunk)
-            bar.update(len(chunk))
+    client = storage.Client()
+    bucket = client.bucket(bucket_name)
 
-    print("Download complete. Extracting...")
+    blobs = list(client.list_blobs(bucket_name, prefix=gcs_prefix))
+    if not blobs:
+        raise RuntimeError(f"No objects found under gs://{bucket_name}/{gcs_prefix}")
 
-    # Unzip into data folder
-    with zipfile.ZipFile(local_filename, "r") as zip_ref:
-        zip_ref.extractall(data_folder)
+    print(f"Downloading {len(blobs)} files from gs://{bucket_name}/{gcs_prefix}")
 
-    print(f"Extraction complete. Files are in '{data_folder}/'")
+    for blob in tqdm(blobs, desc="Downloading", unit="file"):
+        # Skip "directory markers"
+        if blob.name.endswith("/"):
+            continue
 
-    # Clean up the zip file
-    os.remove(local_filename)
+        # Strip prefix and reconstruct local path
+        relative_path = os.path.relpath(blob.name, gcs_prefix)
+        local_path = os.path.join(local_root, relative_path)
+
+        os.makedirs(os.path.dirname(local_path), exist_ok=True)
+        blob.download_to_filename(local_path)
+
+    print("Download complete.")
 
 
 class ScleraDataset(Dataset):

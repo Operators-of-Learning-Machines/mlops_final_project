@@ -57,4 +57,21 @@ Or run
 - `uv run invoke docker-build --progress={auto/tty}`
 
 ## To run the docker image:
-`docker run --rm --gpus all -e WANDB_API_KEY=your_real_api_key_here --shm-size=2g sclera-train:gpu`
+
+We now need to have the sclera-trainer.key.json file locally when building images and running containers locally.
+To get it, run the following commands:
+
+1. gcloud iam service-accounts keys create sclera-trainer.key.json ^
+  --iam-account=sclera-trainer@eternal-lodge-484208-j6.iam.gserviceaccount.com
+
+2. move sclera-trainer.key.json C:\PATH_TO_YOUR_PROJECT\mlops_final_project\
+
+It is already added to the .gitignore file.
+
+Now, to run the container, use:
+
+docker run --rm --gpus all --shm-size=2g `
+  -e WANDB_API_KEY=you_api_key `
+  -v "${PWD}\sclera-trainer.key.json:/secrets/gcp.key.json:ro" `
+  -e GOOGLE_APPLICATION_CREDENTIALS=/secrets/gcp.key.json `
+  sclera-train:gpu
