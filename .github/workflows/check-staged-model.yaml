@@ -49,4 +49,4 @@ jobs:
 
       - name: Run staged model tests
         run: |
-          uv run pytest tests/staged_model_tests.py
+          uv run pytest tests/test_staged.py
