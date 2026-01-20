@@ -21,10 +21,10 @@ def root():
 
 
 @app.post("/sclera_model")
-async def sclera_model(data: UploadFile = File()):
+async def sclera_model(file: UploadFile = File()):
     try:
         # Read uploaded image:
-        img = await data.read()
+        img = await file.read()
         pil_img = Image.open(io.BytesIO(img))
 
         # Transform to correct format before forwarding to model:
@@ -55,4 +55,4 @@ async def sclera_model(data: UploadFile = File()):
     except Exception as e:
         raise HTTPException(status_code=500, detail=e)
     finally:
-        data.file.close() # To ensure the file is always closed
+        file.file.close() # To ensure the file is always closed
