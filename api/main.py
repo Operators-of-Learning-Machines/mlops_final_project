@@ -4,7 +4,7 @@ import io
 from torchvision import transforms
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from sclera_identity_classification.architectures.squeezenet import SqueezeNet
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from http import HTTPStatus
 
 CHANNELS = 3 # model input channels
@@ -50,9 +50,15 @@ async def sclera_model(file: UploadFile = File()):
                 "result": output.flatten().tolist(),
                 "status": HTTPStatus.OK,
             }
+            file.file.close()
             return response
 
+    except UnidentifiedImageError as e:
+        print(f"Detail from exception: {e}")
+        raise HTTPException(status_code=400, detail="Invalid image format. Please upload a valid PNG.")
+    except Image.DecompressionBombError as e:
+        print(f"Detail from exception: {e}")
+        raise HTTPException(status_code=400, detail="Image is too large.")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=e)
-    finally:
-        file.file.close() # To ensure the file is always closed
+        print(f"Detail from exception: {e}")
+        raise HTTPException(status_code=500, detail="Invalid server error.")
