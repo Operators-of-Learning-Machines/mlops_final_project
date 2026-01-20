@@ -4,8 +4,6 @@ on:
 
   repository_dispatch:
     types: [staged_model]
-    branches:
-      - 41-staged-model
 
 jobs:
   test:
