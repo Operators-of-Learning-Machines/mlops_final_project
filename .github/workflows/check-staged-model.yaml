@@ -1,13 +1,9 @@
-name: Unit Tests & Coverage
+name: Check Staged Model
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-  workflow_dispatch: {}  # Allows manual executions
+
+  repository_dispatch:
+    types: [staged_model]
 
 jobs:
   test:
@@ -48,11 +44,9 @@ jobs:
       - name: Install uv
         run: pip install uv
 
-
       - name: Install dependencies
         run: uv sync --group dev
 
-      - name: Run tests with coverage
+      - name: Run staged model tests
         run: |
-          uv run coverage run -m pytest tests/test_data.py tests/test_model.py tests/test_api.py
-          uv run coverage report -m
+          uv run pytest tests/staged_model_tests.py
