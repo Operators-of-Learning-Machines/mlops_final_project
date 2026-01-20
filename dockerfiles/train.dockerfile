@@ -23,9 +23,7 @@ RUN uv sync --frozen --no-install-project
 COPY README.md README.md
 COPY configs configs/
 COPY models models/
-COPY wandb wandb/
 COPY tests tests/
-COPY data data/
 
 
 COPY src src/
