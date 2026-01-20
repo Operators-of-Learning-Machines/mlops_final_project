@@ -1,4 +1,3 @@
-import os
 import torch
 import io
 
@@ -16,8 +15,8 @@ app = FastAPI()
 @app.get("/")
 def root():
     return {
-        "message": "Hello world!",
-        "status-code": HTTPStatus.OK
+        "message": "Welcome to the Sclera Identity Classification inference API!",
+        "status": HTTPStatus.OK
     }
 
 
@@ -49,7 +48,7 @@ async def sclera_model(data: UploadFile = File()):
             # Format and send a response:
             response = {
                 "result": output.flatten().tolist(),
-                "status": HTTPStatus.OK
+                "status": HTTPStatus.OK,
             }
             return response
 
