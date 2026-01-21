@@ -6,7 +6,8 @@ from sclera_identity_classification.data import ensure_data_present
 from pathlib import Path
 import pytest
 import wandb
-from models.ensure_model_pulled import pull_wandb
+from models.ensure_model_pulled import pull_wandb 
+
 
 client = TestClient(app)
 
@@ -56,8 +57,9 @@ def test_large_file_upload(define_img_limit):
 
 
 
-def test_sclera_inference(pull_wandb):
+def test_sclera_inference():
     ensure_data_present() # Ensure data exists before defining test img path
+    pull_wandb()
     test_img_path = "data/1_L/1L_l_1.png"
 
     with open(test_img_path, "rb") as f:
