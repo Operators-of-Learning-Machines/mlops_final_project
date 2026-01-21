@@ -1,13 +1,11 @@
 from fastapi.testclient import TestClient
 from api.main import app
 from http import HTTPStatus
-import pytest
 from PIL import Image
 from sclera_identity_classification.data import ensure_data_present
-
+from pathlib import Path
 import pytest
 import wandb
-from pathlib import Path
 
 
 @pytest.fixture(scope="session")
