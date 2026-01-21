@@ -3,9 +3,7 @@ from api.main import app
 from http import HTTPStatus
 from PIL import Image
 from sclera_identity_classification.data import ensure_data_present
-from pathlib import Path
 import pytest
-import wandb
 from models.ensure_model_pulled import pull_wandb 
 
 

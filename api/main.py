@@ -4,7 +4,6 @@ import io
 from torchvision import transforms
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from sclera_identity_classification.architectures.squeezenet import SqueezeNet
-from PIL import Image
 from http import HTTPStatus
 import os
 from models.ensure_model_pulled import pull_wandb
