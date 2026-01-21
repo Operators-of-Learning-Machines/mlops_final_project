@@ -1,20 +1,46 @@
-import torch
 import io
 
 from torchvision import transforms
 from fastapi import FastAPI, File, UploadFile, HTTPException
-from sclera_identity_classification.architectures.squeezenet import SqueezeNet
 from http import HTTPStatus
 import os
 from models.ensure_model_pulled import pull_wandb
 from PIL import Image, UnidentifiedImageError
 from PIL.Image import DecompressionBombError
+from models import onnx as onnx_module
+from contextlib import asynccontextmanager
+
 
 
 CHANNELS = 3 # model input channels
 MODEL_PATH = "models/model.pth" # statically set to the sclera model (note modify if multiple models are added)
+MODEL_ONNX_PATH = "models/model.onnx"
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Runs once at application startup.
+    Ensures the ONNX model exists and loads it into memory.
+    """
+
+    if not os.path.exists(MODEL_ONNX_PATH):
+        if not os.path.exists(MODEL_PATH):
+            pull_wandb()
+
+        onnx_module.export_to_onnx(
+            pth_path=MODEL_PATH,
+            onnx_path=MODEL_ONNX_PATH
+        )
+
+    onnx_module.load_onnx_session()
+
+    yield
+
+
+
+app = FastAPI(lifespan=lifespan)
+
 
 @app.get("/")
 def root():
@@ -27,8 +53,6 @@ def root():
 @app.post("/sclera_model")
 async def sclera_model(file: UploadFile = File()):
     try:
-        if not os.path.exists(MODEL_PATH):
-            pull_wandb()
 
         img = await file.read()
 
@@ -48,24 +72,25 @@ async def sclera_model(file: UploadFile = File()):
 
         base_transform = transforms.Compose(
             [
+                transforms.Resize((224, 224)),
                 transforms.Grayscale(3),
                 transforms.ToTensor(),
                 transforms.Normalize(0.5, 0.5),
             ]
         )
 
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        input_img = base_transform(pil_img).to(device)
+        input_img = base_transform(pil_img)
         input_img = input_img.unsqueeze(0)
 
-        net = SqueezeNet(
-            transfer_learning_model_path=MODEL_PATH,
-            out_channels=220
-        ).to(device)
+        # ONNX expects numpy arrays
+        input_np = input_img.numpy()
 
-        with torch.inference_mode():
-            output = net(input_img)
+        # Run inference
+        output = onnx_module.onnx_session.run(
+            None,
+            {"input": input_np}
+        )[0]
 
         return {
             "result": output.flatten().tolist(),
