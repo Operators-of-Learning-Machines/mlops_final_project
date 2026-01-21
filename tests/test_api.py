@@ -39,6 +39,7 @@ def test_file_upload():
     assert "Invalid image format. Please upload a valid PNG." == response.json()["detail"]
 
 def test_large_file_upload(define_img_limit):
+    ensure_data_present()
     # Test for the exception of uploading a way too large image:
     test_img_path = "data/1_L/1L_l_1.png"
 
