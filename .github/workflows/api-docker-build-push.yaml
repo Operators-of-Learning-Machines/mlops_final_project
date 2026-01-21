@@ -1,0 +1,85 @@
+name: Build API and Push Docker Image
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch: {}  # Allows manual executions
+
+
+jobs:
+  build-api-image-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+        # Authenticate to GCP
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: eternal-lodge-484208-j6
+
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
+
+      - name: Build API Docker image
+        run: |
+          docker build \
+            -f dockerfiles/api.dockerfile \
+            -t sclera-api:latest \
+            .
+
+      - name: Tag API Docker image
+        run: |
+          docker tag sclera-api:latest \
+            europe-west1-docker.pkg.dev/eternal-lodge-484208-j6/sclera-identity-classification/sclera-api:latest
+
+      - name: Push API Docker image
+        run: |
+          docker push europe-west1-docker.pkg.dev/eternal-lodge-484208-j6/sclera-identity-classification/sclera-api:latest
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy sclera-api \
+            --image europe-west1-docker.pkg.dev/eternal-lodge-484208-j6/sclera-identity-classification/sclera-api:latest \
+            --region europe-west1 \
+            --platform managed \
+            --allow-unauthenticated
+
+    #   - name: Set up Docker Buildx
+    #     uses: docker/setup-buildx-action@v3
+
+    #   - name: Build api  Docker image
+    #     run: | 
+    #         docker build \
+    #           -f dockerfiles/api.dockerfile \
+    #           -t sclera-api:latest \
+    #           .
+
+    #   - name: Tag API Docker image
+    #     run: | 
+    #         docker tag sclera-api:latest europe-west1-docker.pkg.dev/eternal-lodge-484208-j6/sclera-identity-classification/sclera-api:latest
+        
+    #   - name: Push API Docker image to GCP Repository
+    #     run: |
+    #         docker push europe-west1-docker.pkg.dev/eternal-lodge-484208-j6/sclera-identity-classification/sclera-api:latest
+        
+    #   - name: Run the deployed API image in GCP
+    #     run: |
+    #         gcloud run deploy sclera-api --image europe-west1-docker.pkg.dev/eternal-lodge-484208-j6/sclera-identity-classification/sclera-api:latest --region europe-west1 --allow-unauthenticated 
+            
+
+            
+
+
+
+        
+
+
