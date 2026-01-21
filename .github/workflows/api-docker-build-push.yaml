@@ -51,7 +51,8 @@ jobs:
             --image europe-west1-docker.pkg.dev/eternal-lodge-484208-j6/sclera-identity-classification/sclera-api:latest \
             --region europe-west1 \
             --platform managed \
-            --allow-unauthenticated
+            --allow-unauthenticated \
+            --memory 1Gi
 
     #   - name: Set up Docker Buildx
     #     uses: docker/setup-buildx-action@v3
