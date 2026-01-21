@@ -1,9 +1,6 @@
 
 import torch
-import onnxruntime as ort
-import numpy as np
 from sclera_identity_classification.architectures.squeezenet import SqueezeNet
-
 import onnxruntime as ort
 
 onnx_session = None
