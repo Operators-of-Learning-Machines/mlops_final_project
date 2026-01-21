@@ -5,7 +5,7 @@ import hydra
 from hydra.utils import instantiate
 from omegaconf import OmegaConf
 from torch import nn
-from sclera_identity_classification.data import make_dataloaders
+from sclera_identity_classification.data import make_dataloaders, ensure_data_present
 from sclera_identity_classification.evaluate import evaluate
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -77,6 +77,8 @@ def main(config):
 
     print(f"Running on {device}")
 
+    ensure_data_present()
+
     wandb.init(
         project=config.wandb.project,
         mode=config.wandb.mode,
@@ -104,7 +106,7 @@ def main(config):
     wandb.run.summary["test/auc"] = float(test_auc.item())
 
     # Save trained model:
-    torch.save(net, config.model_save_path + ".pth")
+    torch.save(net.state_dict(), config.model_save_path + ".pth")
     artifact = wandb.Artifact(name="sclera-identity-classification-model", type="model", description="A model trained to identify individuals based on sclera images", metadata={"auc": float(test_auc.item())})
     artifact.add_file(config.model_save_path + ".pth")
     wandb.log_artifact(artifact)
