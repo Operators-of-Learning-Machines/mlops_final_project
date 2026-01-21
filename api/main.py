@@ -4,8 +4,11 @@ import io
 from torchvision import transforms
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from sclera_identity_classification.architectures.squeezenet import SqueezeNet
-from PIL import Image, UnidentifiedImageError
+from PIL import Image
 from http import HTTPStatus
+import os
+from models.ensure_model_pulled import pull_wandb
+
 
 CHANNELS = 3 # model input channels
 MODEL_PATH = "models/model.pth" # statically set to the sclera model (note modify if multiple models are added)
@@ -16,15 +19,19 @@ app = FastAPI()
 def root():
     return {
         "message": "Welcome to the Sclera Identity Classification inference API!",
-        "status": HTTPStatus.OK
+        "status-code": HTTPStatus.OK
     }
 
 
 @app.post("/sclera_model")
-async def sclera_model(file: UploadFile = File()):
+async def sclera_model(data: UploadFile = File()):
     try:
+
+        if not os.path.exists(MODEL_PATH):
+            pull_wandb()
+
         # Read uploaded image:
-        img = await file.read()
+        img = await data.read()
         pil_img = Image.open(io.BytesIO(img))
 
         # Transform to correct format before forwarding to model:
@@ -48,17 +55,11 @@ async def sclera_model(file: UploadFile = File()):
             # Format and send a response:
             response = {
                 "result": output.flatten().tolist(),
-                "status": HTTPStatus.OK,
+                "status": HTTPStatus.OK
             }
-            file.file.close()
             return response
 
-    except UnidentifiedImageError as e:
-        print(f"Detail from exception: {e}")
-        raise HTTPException(status_code=400, detail="Invalid image format. Please upload a valid PNG.")
-    except Image.DecompressionBombError as e:
-        print(f"Detail from exception: {e}")
-        raise HTTPException(status_code=400, detail="Image is too large.")
     except Exception as e:
-        print(f"Detail from exception: {e}")
-        raise HTTPException(status_code=500, detail="Invalid server error.")
+        raise HTTPException(status_code=500, detail=e)
+    finally:
+        data.file.close() # To ensure the file is always closed
