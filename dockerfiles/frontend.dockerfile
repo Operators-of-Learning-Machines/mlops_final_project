@@ -26,4 +26,4 @@ COPY frontend frontend/
 
 RUN uv sync --frozen
 
-ENTRYPOINT [ "uv", "run", "streamlit", "run", "frontend/main.py", "--server.port=${PORT}" ]
+ENTRYPOINT ["uv", "run", "streamlit", "run", "frontend/main.py", "--server.address=0.0.0.0", "--server.port=8080"]
