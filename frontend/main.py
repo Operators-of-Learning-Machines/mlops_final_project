@@ -22,7 +22,7 @@ def classify_image(image_bytes, backend):
 def main() -> None:
     # temporary localhost backend for testing
     # backend = "http://localhost:8000"
-    backend = "https://sclera-api-611901019822.europe-west1.run.app/"
+    backend = "https://sclera-api-611901019822.europe-west1.run.app"
 
     st.title("Sclera Identity Classification")
 
