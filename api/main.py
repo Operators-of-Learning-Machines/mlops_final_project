@@ -9,6 +9,8 @@ from PIL import Image, UnidentifiedImageError
 from PIL.Image import DecompressionBombError
 from models import onnx as onnx_module
 from contextlib import asynccontextmanager
+from src.sclera_identity_classification.data_manager import log_sclera_request
+import numpy as np
 
 
 
@@ -91,6 +93,17 @@ async def sclera_model(file: UploadFile = File()):
             None,
             {"input": input_np}
         )[0]
+
+        flat_output = output.flatten().tolist()
+        pred_idx = int(np.argmax(flat_output))
+        confidence = float(flat_output[pred_idx])
+
+        log_sclera_request(
+            image_bytes=img,
+            filename=file.filename,
+            predicted_class=pred_idx,
+            confidence=confidence,
+        )
 
         return {
             "result": output.flatten().tolist(),
