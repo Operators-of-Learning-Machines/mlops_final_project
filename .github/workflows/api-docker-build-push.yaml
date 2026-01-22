@@ -1,4 +1,4 @@
-name: Build API and Push Docker Image
+name: Build API and Push Docker Image to GCP Registry
 
 on:
   push:
@@ -51,29 +51,8 @@ jobs:
             --image europe-west1-docker.pkg.dev/eternal-lodge-484208-j6/sclera-identity-classification/sclera-api:latest \
             --region europe-west1 \
             --platform managed \
-            --allow-unauthenticated
-
-    #   - name: Set up Docker Buildx
-    #     uses: docker/setup-buildx-action@v3
-
-    #   - name: Build api  Docker image
-    #     run: | 
-    #         docker build \
-    #           -f dockerfiles/api.dockerfile \
-    #           -t sclera-api:latest \
-    #           .
-
-    #   - name: Tag API Docker image
-    #     run: | 
-    #         docker tag sclera-api:latest europe-west1-docker.pkg.dev/eternal-lodge-484208-j6/sclera-identity-classification/sclera-api:latest
-        
-    #   - name: Push API Docker image to GCP Repository
-    #     run: |
-    #         docker push europe-west1-docker.pkg.dev/eternal-lodge-484208-j6/sclera-identity-classification/sclera-api:latest
-        
-    #   - name: Run the deployed API image in GCP
-    #     run: |
-    #         gcloud run deploy sclera-api --image europe-west1-docker.pkg.dev/eternal-lodge-484208-j6/sclera-identity-classification/sclera-api:latest --region europe-west1 --allow-unauthenticated 
+            --allow-unauthenticated \
+            --memory 1Gi
             
 
             

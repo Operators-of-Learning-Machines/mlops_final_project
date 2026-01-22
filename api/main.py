@@ -1,58 +1,101 @@
-import torch
 import io
 
 from torchvision import transforms
 from fastapi import FastAPI, File, UploadFile, HTTPException
-from sclera_identity_classification.architectures.squeezenet import SqueezeNet
-from PIL import Image
 from http import HTTPStatus
+import os
+from models.ensure_model_pulled import pull_wandb
+from PIL import Image, UnidentifiedImageError
+from PIL.Image import DecompressionBombError
+from models import onnx as onnx_module
+from contextlib import asynccontextmanager
+
+
 
 CHANNELS = 3 # model input channels
 MODEL_PATH = "models/model.pth" # statically set to the sclera model (note modify if multiple models are added)
+MODEL_ONNX_PATH = "models/model.onnx"
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Runs once at application startup.
+    Ensures the ONNX model exists and loads it into memory.
+    """
+
+    if not os.path.exists(MODEL_ONNX_PATH):
+        if not os.path.exists(MODEL_PATH):
+            pull_wandb()
+
+        onnx_module.export_to_onnx(
+            pth_path=MODEL_PATH,
+            onnx_path=MODEL_ONNX_PATH
+        )
+
+    onnx_module.load_onnx_session()
+
+    yield
+
+
+
+app = FastAPI(lifespan=lifespan)
+
 
 @app.get("/")
 def root():
     return {
-        "message": "Hello world!",
-        "status-code": HTTPStatus.OK
+        "message": "Welcome to the Sclera Identity Classification inference API!",
+        "status": HTTPStatus.OK
     }
 
 
 @app.post("/sclera_model")
-async def sclera_model(data: UploadFile = File()):
+async def sclera_model(file: UploadFile = File()):
     try:
-        # Read uploaded image:
-        img = await data.read()
-        pil_img = Image.open(io.BytesIO(img))
 
-        # Transform to correct format before forwarding to model:
+        img = await file.read()
+
+        try:
+            pil_img = Image.open(io.BytesIO(img))
+            pil_img.load()  # force decoding now
+        except UnidentifiedImageError:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid image format. Please upload a valid PNG."
+            )
+        except DecompressionBombError:
+            raise HTTPException(
+                status_code=400,
+                detail="Image is too large."
+            )
+
         base_transform = transforms.Compose(
             [
+                transforms.Resize((224, 224)),
                 transforms.Grayscale(3),
                 transforms.ToTensor(),
                 transforms.Normalize(0.5, 0.5),
             ]
         )
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        input_img = base_transform(pil_img).to(device)
+
+        input_img = base_transform(pil_img)
         input_img = input_img.unsqueeze(0)
 
-        net = SqueezeNet(transfer_learning_model_path=MODEL_PATH, out_channels=220)
-        net.to(device)
+        # ONNX expects numpy arrays
+        input_np = input_img.numpy()
 
-        with torch.inference_mode():
-            output = net(input_img)
-            # Format and send a response:
-            response = {
-                "result": output.flatten().tolist(),
-                "status": HTTPStatus.OK
-            }
-            return response
+        # Run inference
+        output = onnx_module.onnx_session.run(
+            None,
+            {"input": input_np}
+        )[0]
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=e)
+        return {
+            "result": output.flatten().tolist(),
+            "status": HTTPStatus.OK
+        }
+
     finally:
-        data.file.close() # To ensure the file is always closed
+        file.file.close()
