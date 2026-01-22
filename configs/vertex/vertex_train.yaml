@@ -10,15 +10,6 @@ steps:
       mv ${_VERTEX_TRAIN_CONFIG}.tmp ${_VERTEX_TRAIN_CONFIG}
   secretEnv: ['WANDB_API_KEY']
 
-- name: 'alpine'
-  id: "Show config"
-  waitFor: ['Replace values in the training config']
-  entrypoint: "sh"
-  args:
-    - '-c'
-    - |
-      cat "${_VERTEX_TRAIN_CONFIG}"
-
 - name: 'gcr.io/cloud-builders/gcloud'
   id: 'Train on vertex AI'
   waitFor: ['Replace values in the training config']
@@ -32,7 +23,6 @@ steps:
     'vertex-train-job',
     '--config',
     '${_VERTEX_TRAIN_CONFIG}',
-    "--args=--config_file=configs/experiment/exp_3.yaml"
   ]
 substitutions:
   _VERTEX_TRAIN_CONFIG: 'configs/vertex/config_gpu.yaml'
