@@ -1,5 +1,7 @@
 from locust import HttpUser, task, between
+from src.sclera_identity_classification.data import ensure_data_present
 
+#ensure_data_present() # To ensure IMG_PATH doesn't fail...
 
 IMG_PATH = "data/1_L/1L_l_1.png" # Locally saved test image...
 
