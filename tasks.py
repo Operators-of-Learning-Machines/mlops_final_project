@@ -22,6 +22,7 @@ def train(ctx: Context, experiment="exp_1") -> None:
     """Train model."""
     ctx.run(f"uv run src/{PROJECT_NAME}/train.py experiment={experiment}", echo=True, pty=not WINDOWS)
 
+
 @task
 def test(ctx: Context) -> None:
     """Run tests."""
@@ -45,6 +46,18 @@ def docker_build(ctx: Context, progress: str = "plain") -> None:
     #     pty=not WINDOWS
     # )
 
+@task
+def docker_build_frontend(ctx: Context, progress: str = "plain") -> None:
+    """Build docker image for frontend."""
+    ctx.run(
+        f"docker build "
+        f"-f dockerfiles/frontend.dockerfile "
+        f"-t sclera-frontend:latest "
+        f"--progress={progress} "
+        f".",
+        echo=True,
+        pty=not WINDOWS,
+    )
 
 # Documentation commands
 @task
