@@ -37,6 +37,7 @@ dependencies = [
     "onnx>=1.20.1",
     "onnxruntime>=1.23.2",
     "onnxscript>=0.5.7",
+    "locust>=2.43.1",
     "prometheus-client>=0.24.1",
 ]
 
