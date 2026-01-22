@@ -53,3 +53,4 @@ def log_sclera_request(
         json.dumps(record),
         content_type="application/json"
     )
+    
