@@ -9,7 +9,7 @@ with open(IMG_PATH, "rb") as f:
 
 class TestUser(HttpUser):
 
-    wait_time = between(1, 10) # waits 1-10 seconds between each request
+    wait_time = between(1, 2) # waits 1-10 seconds between each request
 
     @task
     def get_root(self):
