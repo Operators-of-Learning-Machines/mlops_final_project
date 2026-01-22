@@ -4,7 +4,6 @@ import hashlib
 from datetime import datetime, timezone
 from google.cloud import storage
 import uuid
-import os
 
 BUCKET_NAME = "sclera-api-logging"
 
