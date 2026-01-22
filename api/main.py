@@ -11,6 +11,9 @@ from models import onnx as onnx_module
 from contextlib import asynccontextmanager
 import time
 from prometheus_client import Counter, Histogram, make_asgi_app
+from src.sclera_identity_classification.data_manager import log_sclera_request
+import numpy as np
+
 
 
 CHANNELS = 3 # model input channels
@@ -118,6 +121,16 @@ async def sclera_model(file: UploadFile = File()):
         )[0]
 
         successful_inference_counter.inc()
+        flat_output = output.flatten().tolist()
+        pred_idx = int(np.argmax(flat_output))
+        confidence = float(flat_output[pred_idx])
+
+        log_sclera_request(
+            image_bytes=img,
+            filename=file.filename,
+            predicted_class=pred_idx,
+            confidence=confidence,
+        )
 
         return {
             "result": output.flatten().tolist(),
