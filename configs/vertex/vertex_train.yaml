@@ -32,6 +32,7 @@ steps:
     'vertex-train-job',
     '--config',
     '${_VERTEX_TRAIN_CONFIG}',
+    "--args=--config_file=configs/experiment/exp_3.yaml"
   ]
 substitutions:
   _VERTEX_TRAIN_CONFIG: 'configs/vertex/config_gpu.yaml'
