@@ -1,7 +1,6 @@
 import pandas as pd
 import requests
 import streamlit as st
-from torch import softmax
 import torch
 
 def classify_image(image_bytes, backend):
@@ -9,21 +8,21 @@ def classify_image(image_bytes, backend):
     url = f"{backend}/sclera_model"
 
     files = {
-        "data": ("image.png", image_bytes, "image/png")
+        "file": ("image.png", image_bytes, "image/png")
     }
 
     response = requests.post(url, files=files, timeout=10)
 
     if response.status_code != 200:
-        st.error(f"Backend error: {response.text}")
+        st.error(f"Backend error {response.status_code}: {response.text}")
         return None
 
     return response.json()
 
-
 def main() -> None:
     # temporary localhost backend for testing
-    backend = "http://localhost:8000"  # NO path here
+    # backend = "http://localhost:8000"
+    backend = "https://sclera-api-611901019822.europe-west1.run.app/"
 
     st.title("Sclera Identity Classification")
 
