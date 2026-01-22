@@ -7,7 +7,10 @@ import pytest
 from models.ensure_model_pulled import pull_wandb 
 
 
-client = TestClient(app)
+@pytest.fixture
+def client():
+    with TestClient(app) as client:
+        yield client
 
 
 @pytest.fixture
@@ -18,7 +21,7 @@ def define_img_limit():
     Image.MAX_IMAGE_PIXELS = og_limit
 
 
-def test_root():
+def test_root(client):
     response = client.get("/")
     assert response.status_code == 200
     assert response.json() == {
@@ -26,7 +29,7 @@ def test_root():
         "status": HTTPStatus.OK
     }
 
-def test_file_upload():
+def test_file_upload(client):
     # Test for uploading a different file type than the expected png format:
     response = client.post(
         "sclera_model",
@@ -37,7 +40,7 @@ def test_file_upload():
     assert response.status_code == 400
     assert "Invalid image format. Please upload a valid PNG." == response.json()["detail"]
 
-def test_large_file_upload(define_img_limit):
+def test_large_file_upload(define_img_limit, client):
     ensure_data_present()
     # Test for the exception of uploading a way too large image:
     test_img_path = "data/1_L/1L_l_1.png"
@@ -55,7 +58,7 @@ def test_large_file_upload(define_img_limit):
 
 
 
-def test_sclera_inference():
+def test_sclera_inference(client):
     ensure_data_present() # Ensure data exists before defining test img path
     pull_wandb()
     test_img_path = "data/1_L/1L_l_1.png"
