@@ -15,6 +15,10 @@ jobs:
       contents: read
       id-token: write
     runs-on: ${{ matrix.operating-system }}
+
+    env:
+      WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+
     strategy:
       matrix:
         operating-system: ["ubuntu-latest", "windows-latest"]
@@ -48,11 +52,26 @@ jobs:
       - name: Install uv
         run: pip install uv
 
-
       - name: Install dependencies
         run: uv sync --group dev
 
-      - name: Run tests with coverage
+      - name: Run coverage
         run: |
-          uv run coverage run -m pytest tests/test_data.py tests/test_model.py tests/test_api.py
+          uv run coverage run -m pytest
           uv run coverage report -m
+
+      - name: Run api tests 
+        run: |
+          uv run -m pytest tests/test_api.py
+
+      - name: Run model tests 
+        run: |
+          uv run -m pytest tests/test_model.py
+
+      - name: Run data tests 
+        run: |
+          uv run -m pytest tests/test_data.py
+
+      - name: Run stage tests 
+        run: |
+          uv run -m pytest tests/test_staged.py

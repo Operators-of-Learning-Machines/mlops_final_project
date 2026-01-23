@@ -1,0 +1,16 @@
+# @package _global_
+experiment_name: exp_1
+
+defaults: 
+  - override /model: squeezenet
+  - override /optimizer: rms
+
+# Global variables:
+epochs: 30
+batch_size: 60
+
+# Set variables for specific sub-config files (e.g. rms.yaml):
+optimizer: 
+ lr: 1e-2
+#model: 
+#  pretrained: True

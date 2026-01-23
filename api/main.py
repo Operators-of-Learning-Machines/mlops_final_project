@@ -1,58 +1,143 @@
-import torch
 import io
 
 from torchvision import transforms
 from fastapi import FastAPI, File, UploadFile, HTTPException
-from sclera_identity_classification.architectures.squeezenet import SqueezeNet
-from PIL import Image
 from http import HTTPStatus
+import os
+from models.ensure_model_pulled import pull_wandb
+from PIL import Image, UnidentifiedImageError
+from PIL.Image import DecompressionBombError
+from models import onnx as onnx_module
+from contextlib import asynccontextmanager
+import time
+from prometheus_client import Counter, Histogram, make_asgi_app
+from src.sclera_identity_classification.data_manager import log_sclera_request
+import numpy as np
+
+
 
 CHANNELS = 3 # model input channels
 MODEL_PATH = "models/model.pth" # statically set to the sclera model (note modify if multiple models are added)
+MODEL_ONNX_PATH = "models/model.onnx"
 
-app = FastAPI()
+root_counter = Counter("root_call", "Number of calls to the root endpoint")
+successful_inference_counter = Counter("successful_inference", "Number of successfull calls to the inference endpoint")
+failed_inference_counter = Counter("failed_inference", "Number of failed calls to the inference endpoint")
+inference_requests_total = Counter(
+    "sclera_inference_requests_total",
+    "Total number of inference requests"
+)
+
+# Latency histogram (seconds)
+inference_latency_seconds = Histogram(
+    "sclera_inference_latency_seconds",
+    "Time spent processing inference requests",
+    buckets=(0.05, 0.1, 0.25, 0.5, 1, 2, 5)
+)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Runs once at application startup.
+    Ensures the ONNX model exists and loads it into memory.
+    """
+
+    if not os.path.exists(MODEL_ONNX_PATH):
+        if not os.path.exists(MODEL_PATH):
+            pull_wandb()
+
+        onnx_module.export_to_onnx(
+            pth_path=MODEL_PATH,
+            onnx_path=MODEL_ONNX_PATH
+        )
+
+    onnx_module.load_onnx_session()
+
+    yield
+
+
+
+app = FastAPI(lifespan=lifespan)
+app.mount("/metrics", make_asgi_app())
+
 
 @app.get("/")
 def root():
+    root_counter.inc()
     return {
-        "message": "Hello world!",
-        "status-code": HTTPStatus.OK
+        "message": "Welcome to the Sclera Identity Classification inference API!",
+        "status": HTTPStatus.OK
     }
 
 
-@app.post("/sclera_model")
-async def sclera_model(data: UploadFile = File()):
-    try:
-        # Read uploaded image:
-        img = await data.read()
-        pil_img = Image.open(io.BytesIO(img))
 
-        # Transform to correct format before forwarding to model:
+@app.post("/sclera_model")
+async def sclera_model(file: UploadFile = File()):
+
+    inference_requests_total.inc()
+    start_time = time.perf_counter()
+    
+    try:
+
+        img = await file.read()
+
+        try:
+            pil_img = Image.open(io.BytesIO(img))
+            pil_img.load()  # force decoding now
+        except UnidentifiedImageError:
+            failed_inference_counter.inc()
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid image format. Please upload a valid PNG."
+            )
+        except DecompressionBombError:
+            failed_inference_counter.inc()
+            raise HTTPException(
+                status_code=400,
+                detail="Image is too large."
+            )
+
         base_transform = transforms.Compose(
             [
+                transforms.Resize((224, 224)),
                 transforms.Grayscale(3),
                 transforms.ToTensor(),
                 transforms.Normalize(0.5, 0.5),
             ]
         )
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        input_img = base_transform(pil_img).to(device)
+
+        input_img = base_transform(pil_img)
         input_img = input_img.unsqueeze(0)
 
-        net = SqueezeNet(transfer_learning_model_path=MODEL_PATH, out_channels=220)
-        net.to(device)
+        # ONNX expects numpy arrays
+        input_np = input_img.numpy()
 
-        with torch.inference_mode():
-            output = net(input_img)
-            # Format and send a response:
-            response = {
-                "result": output.flatten().tolist(),
-                "status": HTTPStatus.OK
-            }
-            return response
+        # Run inference
+        output = onnx_module.onnx_session.run(
+            None,
+            {"input": input_np}
+        )[0]
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=e)
+        successful_inference_counter.inc()
+        flat_output = output.flatten().tolist()
+        pred_idx = int(np.argmax(flat_output))
+        confidence = float(flat_output[pred_idx])
+
+        log_sclera_request(
+            image_bytes=img,
+            filename=file.filename,
+            predicted_class=pred_idx,
+            confidence=confidence,
+        )
+
+        return {
+            "result": output.flatten().tolist(),
+            "status": HTTPStatus.OK
+        }
+
     finally:
-        data.file.close() # To ensure the file is always closed
+        elapsed = time.perf_counter() - start_time
+        inference_latency_seconds.observe(elapsed)
+        file.file.close()

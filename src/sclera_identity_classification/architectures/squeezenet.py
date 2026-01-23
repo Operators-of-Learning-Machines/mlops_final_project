@@ -12,7 +12,15 @@ class SqueezeNet(nn.Module):
             kernel_size
         )
         if transfer_learning_model_path:
-            self.load_state_dict(torch.load(transfer_learning_model_path))
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+            state_dict = torch.load(
+                transfer_learning_model_path,
+                map_location=device
+            )
+
+            self.load_state_dict(state_dict)
+
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.model.features(x)
