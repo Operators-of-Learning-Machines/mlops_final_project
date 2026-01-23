@@ -13,27 +13,20 @@ import time
 from prometheus_client import Counter, Histogram, make_asgi_app
 from src.sclera_identity_classification.data_manager import log_sclera_request
 import numpy as np
+from fastapi.middleware.cors import CORSMiddleware
 
 
-
-CHANNELS = 3 # model input channels
-MODEL_PATH = "models/model.pth" # statically set to the sclera model (note modify if multiple models are added)
+CHANNELS = 3  # model input channels
+MODEL_PATH = "models/model.pth"  # statically set to the sclera model (note modify if multiple models are added)
 MODEL_ONNX_PATH = "models/model.onnx"
 
 root_counter = Counter("root_call", "Number of calls to the root endpoint")
 successful_inference_counter = Counter("successful_inference", "Number of successfull calls to the inference endpoint")
 failed_inference_counter = Counter("failed_inference", "Number of failed calls to the inference endpoint")
-inference_requests_total = Counter(
-    "sclera_inference_requests_total",
-    "Total number of inference requests"
-)
+inference_requests_total = Counter("sclera_inference_requests_total", "Total number of inference requests")
 
 # Latency histogram (seconds)
-inference_latency_seconds = Histogram(
-    "sclera_inference_latency_seconds",
-    "Time spent processing inference requests",
-    buckets=(0.05, 0.1, 0.25, 0.5, 1, 2, 5)
-)
+inference_latency_seconds = Histogram("sclera_inference_latency_seconds", "Time spent processing inference requests", buckets=(0.05, 0.1, 0.25, 0.5, 1, 2, 5))
 
 
 @asynccontextmanager
@@ -47,29 +40,31 @@ async def lifespan(app: FastAPI):
         if not os.path.exists(MODEL_PATH):
             pull_wandb()
 
-        onnx_module.export_to_onnx(
-            pth_path=MODEL_PATH,
-            onnx_path=MODEL_ONNX_PATH
-        )
+        onnx_module.export_to_onnx(pth_path=MODEL_PATH, onnx_path=MODEL_ONNX_PATH)
 
     onnx_module.load_onnx_session()
 
     yield
 
 
-
 app = FastAPI(lifespan=lifespan)
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.mount("/metrics", make_asgi_app())
 
 
 @app.get("/")
 def root():
     root_counter.inc()
-    return {
-        "message": "Welcome to the Sclera Identity Classification inference API!",
-        "status": HTTPStatus.OK
-    }
-
+    return {"message": "Welcome to the Sclera Identity Classification inference API!", "status": HTTPStatus.OK}
 
 
 @app.post("/sclera_model")
@@ -77,7 +72,7 @@ async def sclera_model(file: UploadFile = File()):
 
     inference_requests_total.inc()
     start_time = time.perf_counter()
-    
+
     try:
 
         img = await file.read()
@@ -87,16 +82,10 @@ async def sclera_model(file: UploadFile = File()):
             pil_img.load()  # force decoding now
         except UnidentifiedImageError:
             failed_inference_counter.inc()
-            raise HTTPException(
-                status_code=400,
-                detail="Invalid image format. Please upload a valid PNG."
-            )
+            raise HTTPException(status_code=400, detail="Invalid image format. Please upload a valid PNG.")
         except DecompressionBombError:
             failed_inference_counter.inc()
-            raise HTTPException(
-                status_code=400,
-                detail="Image is too large."
-            )
+            raise HTTPException(status_code=400, detail="Image is too large.")
 
         base_transform = transforms.Compose(
             [
@@ -107,7 +96,6 @@ async def sclera_model(file: UploadFile = File()):
             ]
         )
 
-
         input_img = base_transform(pil_img)
         input_img = input_img.unsqueeze(0)
 
@@ -115,10 +103,7 @@ async def sclera_model(file: UploadFile = File()):
         input_np = input_img.numpy()
 
         # Run inference
-        output = onnx_module.onnx_session.run(
-            None,
-            {"input": input_np}
-        )[0]
+        output = onnx_module.onnx_session.run(None, {"input": input_np})[0]
 
         successful_inference_counter.inc()
         flat_output = output.flatten().tolist()
@@ -132,10 +117,7 @@ async def sclera_model(file: UploadFile = File()):
             confidence=confidence,
         )
 
-        return {
-            "result": output.flatten().tolist(),
-            "status": HTTPStatus.OK
-        }
+        return {"result": output.flatten().tolist(), "status": HTTPStatus.OK}
 
     finally:
         elapsed = time.perf_counter() - start_time
