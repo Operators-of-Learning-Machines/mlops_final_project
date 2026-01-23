@@ -718,6 +718,16 @@ Student s253070 was in charge of:
 - Contributing to general project maintenance by closing Week 1 and Week 2 milestone tasks and ensuring compliance with course requirements.
 
 
+Student s200655 was in charge of:
+- Implement unit tests for the api
+- Conduct load tests
+- Generate the configuration files for experiment reproducibility using Hydra
+- Implement the api endpoints
+- Setting up the docker image for the api
+- Adding the api tests to the continuous integration tests in Github
+
+
+
 We used ChatGPT and Gemini for:
 - Generating small pseudocode snippets and adapting it to our cases
 - Helping with identification of bugs for their faster resolution
