@@ -23,6 +23,7 @@ COPY src src/
 COPY README.md README.md
 COPY frontend frontend/
 
+EXPOSE 8080
 
 RUN uv sync --frozen
 
