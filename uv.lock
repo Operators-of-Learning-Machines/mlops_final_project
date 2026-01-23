@@ -2033,24 +2033,17 @@ dependencies = [
     { name = "google-cloud-storage" },
     { name = "httpx" },
     { name = "hydra-core" },
-<<<<<<< HEAD
     { name = "markdown" },
-=======
     { name = "locust" },
->>>>>>> main
     { name = "numpy" },
     { name = "onnx" },
     { name = "onnxruntime" },
     { name = "onnxscript" },
     { name = "pandas" },
     { name = "pre-commit" },
-<<<<<<< HEAD
-    { name = "python-multipart" },
-=======
     { name = "prometheus-client" },
     { name = "python-multipart" },
     { name = "streamlit" },
->>>>>>> main
     { name = "torch" },
     { name = "torcheval" },
     { name = "torchvision", version = "0.24.1", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux'" },
