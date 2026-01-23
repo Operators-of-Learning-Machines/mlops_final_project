@@ -1,0 +1,53 @@
+<p>Exam project </p>
+<p>Martin Vlacil 254127</p>
+<p>Amalie Sommer Thomsen s200655</p>
+<p>Oskar Kocjancic 253070</p>
+<p>Andrei Soldan s243873</p>
+<h3>Project Goal</h3>
+<p>The goal of the project is to identify a person's identity based on segmented images of their scleras (the white part of the eye). </p>
+<h3>What Frameworks Will We Use?</h3>
+<h4>We intend to use several frameworks that will simplify our work from the development and the MLOps perspective.</h4>
+<p>For the package management, we intend to use <strong>uv</strong>.</p>
+<p>We are using <strong>cookiecutter</strong> and the template provided to us to generate the project repository. </p>
+<p>We will use <strong>git</strong> for version control.</p>
+<p>We will use <strong>Docker</strong> for containerization to ensure that the project runs on the 'same' system.</p>
+<p>We will use <strong>hydra</strong> for the management of configurations.</p>
+<p>We will use <strong>pytorch profiling</strong> for profiling the code. </p>
+<p>For logging we will use <strong>loguru</strong>.</p>
+<p>We intend to use <strong>wandb</strong> for tracing our runs.</p>
+<p>Finally, we intend to use GCP for cloud, where we will deploy our containers and manage other resources. </p>
+<h3>What data are you going to run on (initially, may change)</h3>
+<p>The data we are going to use (initially) is comprised of segmented images of human scleras. </p>
+<p>There are 110 people with 2 identities per person (each identity mapping to a person's eye). Each identity (person's eye) has on average 4 images from different angles. There are around 3704 images in the dataset. </p>
+<p>!Important! - this project does not understake the parsing of images with human eyes into segmented images. </p>
+<h1>Additional Notes on How to Run the Project</h1>
+<h3>What models do you expect to use</h3>
+<p>We are going to use Convolutional Neural Networks (CNNs) for image classification.</p>
+<p>We are starting out with SqueezeNet and itterate from that, using more modern models.</p>
+<h2>Just for running the training script</h2>
+<p><code>uv run invoke train --experiment=exp_{number}</code> </p>
+<h2>To build the docker image with a GPU-compatible base image:</h2>
+<ul>
+<li><code>docker build -f .\dockerfiles\train.dockerfile  -t sclera-train:gpu .</code></li>
+</ul>
+<p>Or run </p>
+<ul>
+<li><code>uv run invoke docker-build --progress={auto/tty}</code></li>
+</ul>
+<h2>To run the docker image:</h2>
+<p>We now need to have the sclera-trainer.key.json file locally when building images and running containers locally.
+To get it, run the following commands:</p>
+<ol>
+<li>
+<p>gcloud iam service-accounts keys create sclera-trainer.key.json ^
+  --iam-account=sclera-trainer@eternal-lodge-484208-j6.iam.gserviceaccount.com</p>
+</li>
+<li>
+<p>move sclera-trainer.key.json C:\PATH_TO_YOUR_PROJECT\mlops_final_project\</p>
+</li>
+</ol>
+<p>It is already added to the .gitignore file.</p>
+<p>Now, to run the container, use:</p>
+<p>docker run --rm --gpus all --shm-size=2g <code>-e WANDB_API_KEY=you_api_key</code>
+  -v "${PWD}\sclera-trainer.key.json:/secrets/gcp.key.json:ro" <code>-e GOOGLE_APPLICATION_CREDENTIALS=/secrets/gcp.key.json</code>
+  sclera-train:gpu</p>

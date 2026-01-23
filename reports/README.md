@@ -1,3 +1,120 @@
+# Exam template for 02476 Machine Learning Operations
+
+This is the report template for the exam. Please only remove the text formatted as with three dashes in front and behind
+like:
+
+```--- question 1 fill here ---```
+
+Where you instead should add your answers. Any other changes may have unwanted consequences when your report is
+auto-generated at the end of the course. For questions where you are asked to include images, start by adding the image
+to the `figures` subfolder (please only use `.png`, `.jpg` or `.jpeg`) and then add the following code in your answer:
+
+`![my_image](figures/<image>.<extension>)`
+
+In addition to this markdown file, we also provide the `report.py` script that provides two utility functions:
+
+Running:
+
+```bash
+python report.py html
+```
+
+Will generate a `.html` page of your report. After the deadline for answering this template, we will auto-scrape
+everything in this `reports` folder and then use this utility to generate a `.html` page that will be your serve
+as your final hand-in.
+
+Running
+
+```bash
+python report.py check
+```
+
+Will check your answers in this template against the constraints listed for each question e.g. is your answer too
+short, too long, or have you included an image when asked. For both functions to work you mustn't rename anything.
+The script has two dependencies that can be installed with
+
+```bash
+pip install typer markdown
+```
+
+or
+
+```bash
+uv add typer markdown
+```
+
+## Overall project checklist
+
+The checklist is *exhaustive* which means that it includes everything that you could do on the project included in the
+curriculum in this course. Therefore, we do not expect at all that you have checked all boxes at the end of the project.
+The parenthesis at the end indicates what module the bullet point is related to. Please be honest in your answers, we
+will check the repositories and the code to verify your answers.
+
+### Week 1
+
+* [x] Create a git repository (M5)
+* [x] Make sure that all team members have write access to the GitHub repository (M5)
+* [x] Create a dedicated environment for you project to keep track of your packages (M2)
+* [x] Create the initial file structure using cookiecutter with an appropriate template (M6)
+* [x] Fill out the `data.py` file such that it downloads whatever data you need and preprocesses it (if necessary) (M6)
+* [x] Add a model to `model.py` and a training procedure to `train.py` and get that running (M6)
+* [x] Remember to either fill out the `requirements.txt`/`requirements_dev.txt` files or keeping your
+    `pyproject.toml`/`uv.lock` up-to-date with whatever dependencies that you are using (M2+M6)
+* [x] Remember to comply with good coding practices (`pep8`) while doing the project (M7)
+* [x] Do a bit of code typing and remember to document essential parts of your code (M7)
+* [ ] Setup version control for your data or part of your data (M8)
+* [x] Add command line interfaces and project commands to your code where it makes sense (M9)
+* [x] Construct one or multiple docker files for your code (M10)
+* [x] Build the docker files locally and make sure they work as intended (M10)
+* [x] Write one or multiple configurations files for your experiments (M11)
+* [x] Used Hydra to load the configurations and manage your hyperparameters (M11)
+* [ ] Use profiling to optimize your code (M12)
+* [x] Use logging to log important events in your code (M14)
+* [x] Use Weights & Biases to log training progress and other important metrics/artifacts in your code (M14)
+* [ ] Consider running a hyperparameter optimization sweep (M14)
+* [ ] Use PyTorch-lightning (if applicable) to reduce the amount of boilerplate in your code (M15)
+
+### Week 2
+
+* [x] Write unit tests related to the data part of your code (M16)
+* [x] Write unit tests related to model construction and or model training (M16)
+* [x] Calculate the code coverage (M16)
+* [x] Get some continuous integration running on the GitHub repository (M17)
+* [x] Add caching and multi-os/python/pytorch testing to your continuous integration (M17)
+* [x] Add a linting step to your continuous integration (M17)
+* [x] Add pre-commit hooks to your version control setup (M18)
+* [ ] Add a continues workflow that triggers when data changes (M19)
+* [x] Add a continues workflow that triggers when changes to the model registry is made (M19)
+* [x] Create a data storage in GCP Bucket for your data and link this with your data version control setup (M21)
+* [x] Create a trigger workflow for automatically building your docker images (M21)
+* [x] Get your model training in GCP using either the Engine or Vertex AI (M21)
+* [x] Create a FastAPI application that can do inference using your model (M22)
+* [x] Deploy your model in GCP using either Functions or Run as the backend (M23)
+* [x] Write API tests for your application and setup continues integration for these (M24)
+* [x] Load test your application (M24)
+* [x] Create a more specialized ML-deployment API using either ONNX or BentoML, or both (M25)
+* [x] Create a frontend for your API (M26)
+
+### Week 3
+
+* [ ] Check how robust your model is towards data drifting (M27)
+* [x] Setup collection of input-output data from your deployed application (M27)
+* [ ] Deploy to the cloud a drift detection API (M27)
+* [x] Instrument your API with a couple of system metrics (M28)
+* [x] Setup cloud monitoring of your instrumented application (M28)
+* [ ] Create one or more alert systems in GCP to alert you if your app is not behaving correctly (M28)
+* [x] If applicable, optimize the performance of your data loading using distributed data loading (M29)
+* [ ] If applicable, optimize the performance of your training pipeline by using distributed training (M30)
+* [ ] Play around with quantization, compilation and pruning for you trained models to increase inference speed (M31)
+
+### Extra
+
+* [ ] Write some documentation for your application (M32)
+* [ ] Publish the documentation to GitHub Pages (M32)
+* [ ] Revisit your initial project description. Did the project turn out as you wanted?
+* [x] Create an architectural diagram over your MLOps pipeline
+* [x] Make sure all group members have an understanding about all parts of the project
+* [x] Uploaded all your code to GitHub
 
 
 ## Group information
@@ -262,14 +379,17 @@ Notice that the WANDB_API_KEY is required and that the person has the proper sec
 
 
 [WANDB Evaluation metrics](figures/wandb_eval_metrics.png)
+
 The first figure contains charts from a training run. We track AUC for every validation epoch and loss for every train epoch and batch. The validation and train metrics are split into separate dropdowns for future additions of more possible metrics. We also store gradients.
 
 
 [WANDB run config and overview](figures/wandb_run_config_and_overview.png)
+
 All the metrics from the previous figures have their final value stored as a summary metric. The page also shows the hyperparameters used from the configuration file input for training.
 
 
 [WANDB run logs](figures/wandb_run_logs.png)
+
 Some important information during training is logged in the Logs tab as well, although most of it can be found in the charts too.
 
 
@@ -398,10 +518,12 @@ For model training, we used Vertex AI custom training jobs, where the underlying
 
 
 [Artifact Repository](figures/gcp_artifact_repository.png)
+
 Here we store our 3 images for the api, frontend and the training script.
 
 
 [Train Docker Images](figures/gcp_train_images.png)
+
 The figure above shows the history of previous images for the training script.
 
 

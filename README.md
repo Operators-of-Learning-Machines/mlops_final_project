@@ -1,5 +1,5 @@
 # Sclera Identity Classificatoin
-## MLOps Exam project 
+#### MLOps Exam project 
 
 Martin Vlacil 254127
 
@@ -29,7 +29,9 @@ We will use **pytorch profiling** for profiling the code.
 
 For logging we will use **loguru**.
 
-Finally, we intend to use **wandb** for tracing our runs.
+We intend to use **wandb** for tracing our runs.
+
+Finally, we intend to use GCP for cloud, where we will deploy our containers and manage other resources. 
 
 ### What data are you going to run on (initially, may change)
 The data we are going to use (initially) is comprised of segmented images of human scleras. 
@@ -37,6 +39,8 @@ The data we are going to use (initially) is comprised of segmented images of hum
 There are 110 people with 2 identities per person (each identity mapping to a person's eye). Each identity (person's eye) has on average 4 images from different angles. There are around 3704 images in the dataset. 
 
 !Important! - this project does not understake the parsing of images with human eyes into segmented images. 
+
+# Additional Notes on How to Run the Project
 
 
 ### What models do you expect to use
