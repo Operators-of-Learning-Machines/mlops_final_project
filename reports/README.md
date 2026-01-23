@@ -246,7 +246,7 @@ Overall we primarily tested critical parts of the code such as data formatting a
 Our total code coverage is 72%, which indicates that a substantial portion of the codebase is exercised by automated tests. While this level of coverage helps increase confidence in the stability of core functionality, it does not guarantee that the system is error-free. Code coverage measures which lines of code are executed during testing, but it does not assess whether the tests correctly verify expected behavior or catch logical errors. Even with 100% coverage, tests may miss edge cases, incorrect assumptions, or integration issues, especially in systems involving external dependencies such as model loading. Additionally, a line of code can be executed without being meaningfully validated by assertions. Therefore, while high coverage is useful as an indicator of test completeness, it must be complemented by well-designed test cases, careful validation of edge conditions, and manual review.
 
 
-[Code coverage](figures/code_coverage.png)
+![Code coverage](figures/code_coverage.png)
 
 
 ### Question 9
@@ -395,12 +395,12 @@ Notice that the WANDB_API_KEY is required and that the person has the proper sec
 The first figure contains charts from a training run. We track AUC for every validation epoch and loss for every train epoch and batch. The validation and train metrics are split into separate dropdowns for future additions of more possible metrics. We also store gradients.
 
 
-[WANDB run config and overview](figures/wandb_run_config_and_overview.png)
+![WANDB run config and overview](figures/wandb_run_config_and_overview.png)
 
 All the metrics from the previous figures have their final value stored as a summary metric. The page also shows the hyperparameters used from the configuration file input for training.
 
 
-[WANDB run logs](figures/wandb_run_logs.png)
+![WANDB run logs](figures/wandb_run_logs.png)
 
 Some important information during training is logged in the Logs tab as well, although most of it can be found in the charts too.
 
@@ -631,7 +631,7 @@ For the api unit tests we used Pytest and FastAPI’s TestClient. The unit tests
 
 We also performed load tests of the API. The setup for the load tests were setting the wait_time to send requests every second, and then having 1000 users connect with a spawn rate of 10 new users per second. The results from the load tests:
 
-[Load Tests on API](figures/load_tests_results.png)
+![Load Tests on API](figures/load_tests_results.png)
 
 The results show that it is able to handle requests at a relatively low user count, but as the number of users increases so does the load on the service, which impacts both endpoints. To better adhere to this load some setup changes would have to be made to the gcloud and how it distributes a large amount of incoming requests.
 
