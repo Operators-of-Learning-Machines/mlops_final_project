@@ -734,6 +734,8 @@ Later, we had to figure out how to make sure that all the tests pass on differen
 
 We had some issues when writing tests for the api and making sure that they pass.
 
+We have also spent a lot of time discussing how exactly to solve specific exercises or parts of the project. For example we struggled a bit with how we should in the end connect the api with the deployed model and how do we make sure that the api is connected to the latest version of the model. Then there was the issue of deploying the frontend application and making sure that it can connect to the deployed api. 
+
 
 ### Question 31
 
