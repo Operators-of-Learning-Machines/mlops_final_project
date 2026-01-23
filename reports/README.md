@@ -309,7 +309,6 @@ And to run it, this one:
 With the appropriate environment variables and the present `sclera-trainer.key.json` that contains the key to connect to GCP. This is needed to fetch the data from there, as the containers are loaded without the data. To run different experiments in Docker, one would need to choose an experiment number in the command. 
 The README.md file in the root contains the information on how to get that file if needed, but the user needs to have an account in the GCP project.
 
-
 This is the link to the training Dockerfile: https://github.com/Operators-of-Learning-Machines/mlops_final_project/blob/main/dockerfiles/train.dockerfile
 
 
@@ -495,8 +494,11 @@ To make api calls, a user should send requests to https://sclera-api-61190101982
 > Answer:
 
 For the api unit tests we used Pytest and FastAPI’s TestClient. The unit tests were used to both test the home / root endpoint and more importantly the post endpoint for image upload and model inference. It also tested a couple of error points such as uploading an incorrect file format and uploading a “too large” file.
+
 We also performed load tests of the API. The setup for the load tests were setting the wait_time to send requests every second, and then having 1000 users connect with a spawn rate of 10 new users per second. The results from the load tests:
-[INSERT MISSING TEST RESULTS]
+
+[Load Tests on API](figures/load_tests_results.png)
+
 The results show that it is able to handle requests at a relatively low user count, but as the number of users increases so does the load on the service, which impacts both endpoints. To better adhere to this load some setup changes would have to be made to the gcloud and how it distributes a large amount of incoming requests.
 
 
@@ -533,10 +535,6 @@ Not directly related to metrics or monitoring, but we also log the inference inp
 >
 > Recommended answer length: 100-200 words.
 >
-> Example:
-> *Group member 1 used ..., Group member 2 used ..., in total ... credits was spend during development. The service*
-> *costing the most was ... due to ... . Working in the cloud was ...*
->
 > Answer:
 
 
@@ -544,8 +542,11 @@ We ended up using around 3 USD$ (a bit was used during the exercises) for the cl
 
 
 Compute Engine - 1.66USD
+
 Artifact Registry - 0.58USD
+
 Vertex AI - 0.37USD
+
 Cloud Storage - 0.32USD
 
 
@@ -561,9 +562,6 @@ I think that working in the cloud may be hard to get used to in the beginning, b
 >
 > Recommended answer length: 0-200 words.
 >
-> Example:
-> *We implemented a frontend for our API. We did this because we wanted to show the user ... . The frontend was*
-> *implemented using ...*
 >
 > Answer:
 
@@ -582,15 +580,18 @@ We implemented a simple frontend application using streamlit. It works by having
 >
 > Example:
 >
-> *The starting point of the diagram is our local setup, where we integrated ... and ... and ... into our code.*
-> *Whenever we commit code and push to GitHub, it auto triggers ... and ... . From there the diagram shows ...*
->
 > Answer:
+
 We initially experimented with a VS Code Dev Container for local development but ultimately dropped it due to compatibility issues across our machines. Instead, we developed locally and set up GitHub workflows that trigger whenever a pull request is merged into the main branch. Before any merge is allowed, a full suite of unit and integration tests is executed.
+
 We also added workflows that build Docker images for both the API and the frontend using a Docker runner, push them to Artifact Registry, and deploy them via Cloud Run.
+
 For data storage, we rely on Cloud Storage buckets to store both our dataset and user input logs.
+
 In addition, we experimented with Cloud Triggers to automatically build training images, which are then used to train models on Vertex AI. After training completes, we log both results and model weights to Weights & Biases.
+
 To manage and run different experiments, we use Hydra.
+
 ### Question 30
 
 
@@ -599,14 +600,13 @@ To manage and run different experiments, we use Hydra.
 >
 > Recommended answer length: 200-400 words.
 >
-> Example:
-> *The biggest challenges in the project was using ... tool to do ... . The reason for this was ...*
->
 > Answer:
 
 
 Some of the biggest struggles were in the beginning when figuring out how to work with dev containers.
+
 Later, we had to figure out how to make sure that all the tests pass on different operating systems and with different python versions.
+
 We had some issues when writing tests for the api and making sure that they pass.
 
 
@@ -618,13 +618,6 @@ We had some issues when writing tests for the api and making sure that they pass
 > **tools in your project.**
 >
 > Recommended answer length: 50-300 words.
->
-> Example:
-> *Student sXXXXXX was in charge of developing of setting up the initial cookie cutter project and developing of the*
-> *docker containers for training our applications.*
-> *Student sXXXXXX was in charge of training our models in the cloud and deploying them afterwards.*
-> *All members contributed to code by...*
-> *We have used ChatGPT to help debug our code. Additionally, we used GitHub Copilot to help write some of our code.*
 > Answer:
 
 
@@ -661,11 +654,18 @@ Student s253070 was in charge of:
 - Contributing to general project maintenance by closing Week 1 and Week 2 milestone tasks and ensuring compliance with course requirements.
 
 
+Student s200655 was in charge of:
+- Implement unit tests for the api
+- Conduct load tests
+- Generate the configuration files for experiment reproducibility using Hydra
+- Implement the api endpoints
+- Setting up the docker image for the api
+- Adding the api tests to the continuous integration tests in Github
+
+
+
 We used ChatGPT and Gemini for:
 - Generating small pseudocode snippets and adapting it to our cases
 - Helping with identification of bugs for their faster resolution
 - Clarifying terminology and topics from the MLOps course
 - We also used GitHub Copilot for easier and faster code implementation.
-
-
-
