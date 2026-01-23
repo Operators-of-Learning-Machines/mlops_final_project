@@ -2033,16 +2033,24 @@ dependencies = [
     { name = "google-cloud-storage" },
     { name = "httpx" },
     { name = "hydra-core" },
+<<<<<<< HEAD
+    { name = "markdown" },
+=======
     { name = "locust" },
+>>>>>>> main
     { name = "numpy" },
     { name = "onnx" },
     { name = "onnxruntime" },
     { name = "onnxscript" },
     { name = "pandas" },
     { name = "pre-commit" },
+<<<<<<< HEAD
+    { name = "python-multipart" },
+=======
     { name = "prometheus-client" },
     { name = "python-multipart" },
     { name = "streamlit" },
+>>>>>>> main
     { name = "torch" },
     { name = "torcheval" },
     { name = "torchvision", version = "0.24.1", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "platform_machine == 'aarch64' and platform_python_implementation == 'CPython' and sys_platform == 'linux'" },
@@ -2070,6 +2078,7 @@ requires-dist = [
     { name = "google-cloud-storage", specifier = ">=3.8.0" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "hydra-core", specifier = ">=1.3.2" },
+    { name = "markdown", specifier = ">=3.10" },
     { name = "locust", specifier = ">=2.43.1" },
     { name = "numpy", specifier = ">=2.4.0" },
     { name = "onnx", specifier = ">=1.20.1" },
