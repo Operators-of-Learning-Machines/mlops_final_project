@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Sclera Identity Classification</title>
+		<style>
+			body {
+				font-family: sans-serif;
+				max-width: 600px;
+				margin: 40px auto;
+			}
+			img {
+				max-width: 100%;
+				margin-top: 20px;
+			}
+			canvas {
+				margin-top: 20px;
+				border: 1px solid #ddd;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Sclera Identity Classification</h1>
+
+		<input type="file" id="fileInput" accept="image/*" />
+		<button onclick="submitImage()">Classify</button>
+
+		<p id="status"></p>
+		<img id="preview" />
+
+		<h3 id="result"></h3>
+
+		<canvas id="probChart" width="600" height="300"></canvas>
+
+		<script>
+			const BACKEND = "https://sclera-api-611901019822.europe-west1.run.app";
+
+			async function submitImage() {
+				const input = document.getElementById("fileInput");
+				const status = document.getElementById("status");
+				const result = document.getElementById("result");
+				const preview = document.getElementById("preview");
+
+				if (!input.files.length) {
+					alert("Select an image");
+					return;
+				}
+
+				const file = input.files[0];
+				preview.src = URL.createObjectURL(file);
+
+				const formData = new FormData();
+				formData.append("file", file);
+
+				status.innerText = "Sending request...";
+				result.innerText = "";
+
+				try {
+					const res = await fetch(`${BACKEND}/sclera_model`, {
+						method: "POST",
+						body: formData,
+					});
+
+					if (!res.ok) {
+						throw new Error(await res.text());
+					}
+
+					const data = await res.json();
+					const logits = data.result;
+
+					const probs = softmax(logits);
+					const topClass = probs.indexOf(Math.max(...probs));
+
+					result.innerText = `Top class: ${topClass}`;
+					status.innerText = "Done";
+
+					plotProbs(probs);
+				} catch (err) {
+					status.innerText = "Error";
+					result.innerText = err.message;
+				}
+			}
+
+			function softmax(arr) {
+				const max = Math.max(...arr); // numerical stability
+				const exps = arr.map((x) => Math.exp(x - max));
+				const sum = exps.reduce((a, b) => a + b, 0);
+				return exps.map((x) => x / sum);
+			}
+
+			function plotProbs(probs) {
+				const canvas = document.getElementById("probChart");
+				const ctx = canvas.getContext("2d");
+
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+				const padding = 40;
+				const barWidth = (canvas.width - 2 * padding) / probs.length;
+				const maxHeight = canvas.height - 2 * padding;
+
+				const maxProb = Math.max(...probs);
+
+				ctx.font = "12px sans-serif";
+
+				probs.forEach((p, i) => {
+					const barHeight = (p / maxProb) * maxHeight;
+					// const barHeight = p * maxHeight;
+					const x = padding + i * barWidth;
+					const y = canvas.height - padding - barHeight;
+
+					ctx.fillStyle = "#4a90e2";
+					ctx.fillRect(x, y, barWidth * 0.8, barHeight);
+
+					// class label
+					// ctx.fillStyle = "#000";
+					// ctx.fillText(
+					// 	i,
+					// 	x + barWidth * 0.3,
+					// 	canvas.height - padding + 15
+					// );
+
+					// // probability value
+					// ctx.fillText(
+					// 	p.toFixed(2),
+					// 	x + barWidth * 0.15,
+					// 	y - 5
+					// );
+				});
+
+				// y-axis label
+				ctx.fillText("Probability", 5, padding - 10);
+			}
+		</script>
+	</body>
+</html>
