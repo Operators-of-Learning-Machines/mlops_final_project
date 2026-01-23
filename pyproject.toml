@@ -32,6 +32,13 @@ dependencies = [
     "typer==0.15.1",
     "uvicorn==0.34.0",
     "wandb>=0.23.1",
+    "streamlit>=1.53.0",
+    "httpx>=0.28.1",
+    "onnx>=1.20.1",
+    "onnxruntime>=1.23.2",
+    "onnxscript>=0.5.7",
+    "locust>=2.43.1",
+    "prometheus-client>=0.24.1",
 ]
 
 [dependency-groups]
@@ -49,7 +56,7 @@ dev = [
 line-length = 120
 
 [tool.coverage.run]
-omit = ["tests/*", 
+omit = ["tests/*",
         "/tmp/*",
         "*/_remote_module_non_scriptable.py"
 ]
