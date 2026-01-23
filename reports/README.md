@@ -51,7 +51,9 @@ We did not use any open-source frameworks or packages not covered in the course 
 > Answer:
 
 
-We used uv as a package manager in our project. The list of dependencies can be seen in the `pyproject.toml` file in the root of our repo. To get a copy of the environment, a new team member would need to run `uv sync`. To test that the code works, one would need to either run the tests, the api, or the training script. That can be done by running `uv run uvciron api.main:app ==port 8000` from the root for example. We had a “dev” dependency group that was only used for development, these packages were not synced when running our code in the containers.
+We used `uv` as a package manager in our project. The list of dependencies can be seen in the `pyproject.toml` file in the root of our repo. 
+
+To get a copy of the environment, after cloning the project, a new team member would need to run `uv sync`. To test that the code works, one would need to either run the tests, the api, or the training script. That can be done by running `uv run uvciron api.main:app --port 8000` from the root for example. We had a “dev” dependency group that was only used for development, these packages were not synced when running our code in the containers.
 
 
 ### Question 5
@@ -112,10 +114,6 @@ Overall we primarily tested critical parts of the code such as data formatting a
 >
 > Recommended answer length: 100-200 words.
 >
-> Example:
-> *The total code coverage of code is X%, which includes all our source code. We are far from 100% coverage of our **
-> *code and even if we were then...*
->
 > Answer:
 
 
@@ -123,8 +121,6 @@ Our total code coverage is 72%, which indicates that a substantial portion of th
 
 
 [Code coverage](figures/code_coverage.png)
-
-
 
 
 ### Question 9
@@ -135,26 +131,19 @@ Our total code coverage is 72%, which indicates that a substantial portion of th
 >
 > Recommended answer length: 100-200 words.
 >
-> Example:
-> *We made use of both branches and PRs in our project. In our group, each member had an branch that they worked on in*
-> *addition to the main branch. To merge code we ...*
->
 > Answer:
 
 
 We had a feature branching strategy. On GitHub, we created Issues from the Weekly checkmarks for the project. Each issue would have at least one branch. Pull requests were utilized to merge those branches back into the main branch which were, most of the time, reviewed by at least one other team member. On every pull request, we had the following workflows:
-Code linting with ruff
-Running the Unit tests on Windows, Ubuntu and Python version 3.12 and 3.11
-Building a Docker image for the training script
+- Code linting with ruff
+- Running the Unit tests on Windows, Ubuntu and Python version 3.12 and 3.11
+- Building a Docker image for the training script
 
 
 If any of them did not pass, the person responsible for the task would first fix all the workflow issues before another team member would complete the pull request.
 
 
 GitHub was also configured so that after a successful merge with a pull request, it would delete the branch that it merged from and close the Issue that was connected to it, maintaining the Issues overview seamlessly.
-
-
-
 
 ### Question 10
 
@@ -163,10 +152,6 @@ GitHub was also configured so that after a successful merge with a pull request,
 > **control of your data. If no, explain a case where it would be beneficial to have version control of your data.**
 >
 > Recommended answer length: 100-200 words.
->
-> Example:
-> *We did make use of DVC in the following way: ... . In the end it helped us in ... for controlling ... part of our*
-> *pipeline*
 >
 > Answer:
 
@@ -182,11 +167,6 @@ We did not use DVC as our data would not change throughout the entire project - 
 > **to insert a link to one of your GitHub actions workflow.**
 >
 > Recommended answer length: 200-300 words.
->
-> Example:
-> *We have organized our continuous integration into 3 separate files: one for doing ..., one for running ... testing*
-> *and one for running ... . In particular for our ..., we used ... .An example of a triggered workflow can be seen*
-> *here: <weblink>*
 >
 > Answer:
 
@@ -212,9 +192,6 @@ In the workflows we also check that the API and the training containers build. A
 >
 > Recommended answer length: 50-100 words.
 >
-> Example:
-> *We used a simple argparser, that worked in the following way: Python  my_script.py --lr 1e-3 --batch_size 25*
->
 > Answer:
 
 
@@ -238,10 +215,6 @@ From the root of the project.
 > **is lost when running experiments and that your experiments are reproducible?**
 >
 > Recommended answer length: 100-200 words.
->
-> Example:
-> *We made use of config files. Whenever an experiment is run the following happens: ... . To reproduce an experiment*
-> *one would have to do ...*
 >
 > Answer:
 
@@ -286,10 +259,6 @@ Notice that the WANDB_API_KEY is required and that the person has the proper sec
 >
 > Recommended answer length: 200-300 words + 1 to 3 screenshots.
 >
-> Example:
-> *As seen in the first image when have tracked ... and ... which both inform us about ... in our experiments.*
-> *As seen in the second image we are also tracking ... and ...*
->
 > Answer:
 
 
@@ -316,10 +285,6 @@ We can use these metrics to potentially find issues with some hyperparameters. L
 >
 > Recommended answer length: 100-200 words.
 >
-> Example:
-> *For our project we developed several images: one for training, inference and deployment. For example to run the*
-> *training docker image: `docker run trainer:latest lr=1e-3 batch_size=64`. Link to docker file: <weblink>*
->
 > Answer:
 
 
@@ -343,7 +308,7 @@ And to run it, this one:
   experiment=exp_{number}
 `
 With the appropriate environment variables and the present `sclera-trainer.key.json` that contains the key to connect to GCP. This is needed to fetch the data from there, as the containers are loaded without the data. To run different experiments in Docker, one would need to choose an experiment number in the command. 
-
+The README.md file in the root contains the information on how to get that file if needed, but the user needs to have an account in the GCP project.
 
 This is the link to the training Dockerfile: https://github.com/Operators-of-Learning-Machines/mlops_final_project/blob/main/dockerfiles/train.dockerfile
 
@@ -355,10 +320,6 @@ This is the link to the training Dockerfile: https://github.com/Operators-of-Lea
 > **try to profile your code or do you think it is already perfect?**
 >
 > Recommended answer length: 100-200 words.
->
-> Example:
-> *Debugging method was dependent on group member. Some just used ... and others used ... . We did a single profiling*
-> *run of our main code at some point that showed ...*
 >
 > Answer:
 
@@ -380,27 +341,22 @@ In general, we did not prioritize adding any profiling to our project for code o
 >
 > Recommended answer length: 50-200 words.
 >
-> Example:
-> *We used the following two services: Engine and Bucket. Engine is used for... and Bucket is used for...*
->
 > Answer:
 
 
 During our project we used the following services:
 
 
-Bucket is used for storing our data (images with labels). In our training code and in the associated tests, there is a check if the /data folder is present, and if not, then the data is fetched from the Bucket. This is done so that we don’t push our data to GitHub. The Buckets are also used when logging the requests + responses in the api. So when the /sclera_model endpoint is accessed with an image and the inference is done, both the input and the output is logged in Bucket. 
+**Bucket** is used for storing our data (images with labels). In our training code and in the associated tests, there is a check if the /data folder is present, and if not, then the data is fetched from the Bucket. This is done so that we don’t push our data to GitHub. The Buckets are also used when logging the requests + responses in the api. So when the /sclera_model endpoint is accessed with an image and the inference is done, both the input and the output is logged in Bucket. 
 
 
-Artifact Registry was used for storing the Docker images for training, the API and the frontend. For the api and the frontend, the images are built in GitHub runner and pushed to the artifatory. For training, the image is built in the artifatory through a trigger that gets activated on pushes to main. 
+**Artifact Registry** was used for storing the Docker images for training, the API and the frontend. For the api and the frontend, the images are built in GitHub runner and pushed to the artifatory. For training, the image is built in the artifatory through a trigger that gets activated on pushes to main. 
 
 
-Cloud Run was used to run the containers for the the API and the frontend as services. This way, we make sure that these two applications are working and can be accessed from the browser. 
+**Cloud Run** was used to run the containers for the the API and the frontend as services. This way, we make sure that these two applications are working and can be accessed from the browser. 
 
 
-Vertex AI was used to run the training containers as a custom job. Once it finishes running, the model with all the training + evaluation metrics is stored in WanDB. 
-
-
+**Vertex AI** was used to run the training containers as a custom job. Once it finishes running, the model with all the training + evaluation metrics is stored in WanDB. 
 
 
 ### Question 18
@@ -411,9 +367,6 @@ Vertex AI was used to run the training containers as a custom job. Once it finis
 >
 > Recommended answer length: 100-200 words.
 >
-> Example:
-> *We used the compute engine to run our ... . We used instances with the following hardware: ... and we started the*
-> *using a custom container: ...*
 >
 > Answer:
 
@@ -431,8 +384,9 @@ For model training, we used Vertex AI custom training jobs, where the underlying
 > Answer:
 
 
-[Bucket raw data](figures/gcp_bucket_raw_data.png)
-[API Logging](figures/gcp_bucket/api_logging.png)
+[Bucket raw data](figures/gcp_bucket_raw_data.png) - the data used for training, validation, and testing.
+
+[API Logging](figures/gcp_bucket/api_logging.png) - logs of input+output in the Bucket. 
 
 
 ### Question 20
@@ -462,6 +416,7 @@ The figure above shows the history of previous images for the training script.
 
 
 [Build History on GCP](figures/gcp_build_history.png)
+
 The figure shows the building of a training image that is triggered by pushing code to the main branch on GitHub.
 
 
@@ -472,10 +427,6 @@ The figure shows the building of a training image that is triggered by pushing c
 > **it. If not, describe why.**
 >
 > Recommended answer length: 100-200 words.
->
-> Example:
-> *We managed to train our model in the cloud using the Engine. We did this by ... . The reason we choose the Engine*
-> *was because ...*
 >
 > Answer:
 
@@ -494,10 +445,6 @@ We managed to train our model using Vertex AI. Firstly, there is a trigger waiti
 >
 > Recommended answer length: 100-200 words.
 >
-> Example:
-> *We did manage to write an API for our model. We used FastAPI to do this. We did this by ... . We also added ...*
-> *to the API to make it more ...*
->
 > Answer:
 
 
@@ -505,7 +452,9 @@ We did manage to build an API for our model. We used FastAPI for quick developme
 
 
 / - test endpoint of the “Hello World” type
+
 /metrics - provided by the prometheus package and used for monitoring the api
+
 /sclera_model - the endpoint used for inference. Accepts Files (images of a specific size). There are checks to make sure that only images are accepted and that they are of the correct size. This endpoint then calls the model for inference and outputs a flattened distribution of probabilities as an array of floats. Several metrics are logged here as well - total calls to inference, failed calls, and successful calls.
 
 
@@ -520,10 +469,6 @@ Our model is also wrapped with ONNX, so the api makes sure that both the model a
 >
 > Recommended answer length: 100-200 words.
 >
-> Example:
-> *For deployment we wrapped our model into application using ... . We first tried locally serving the model, which*
-> *worked. Afterwards we deployed it in the cloud, using ... . To invoke the service an user would call*
-> *`curl -X POST -F "file=@file.json"<weburl>`*
 >
 > Answer:
 
@@ -536,6 +481,8 @@ When developing, we also check that the api runs and that it can be dockerized a
 
 Here is the url to the .yaml file that takes care of it: https://github.com/Operators-of-Learning-Machines/mlops_final_project/blob/main/.github/workflows/api-docker-build-push.yaml
 
+To make api calls, a user should send requests to https://sclera-api-611901019822.europe-west1.run.app.
+
 
 ### Question 25
 
@@ -546,6 +493,7 @@ Here is the url to the .yaml file that takes care of it: https://github.com/Oper
 > Recommended answer length: 100-200 words.
 >
 > Answer:
+
 For the api unit tests we used Pytest and FastAPI’s TestClient. The unit tests were used to both test the home / root endpoint and more importantly the post endpoint for image upload and model inference. It also tested a couple of error points such as uploading an incorrect file format and uploading a “too large” file.
 We also performed load tests of the API. The setup for the load tests were setting the wait_time to send requests every second, and then having 1000 users connect with a spawn rate of 10 new users per second. The results from the load tests:
 [INSERT MISSING TEST RESULTS]
@@ -559,10 +507,6 @@ The results show that it is able to handle requests at a relatively low user cou
 > **monitoring would help the longevity of your application.**
 >
 > Recommended answer length: 100-200 words.
->
-> Example:
-> *We did not manage to implement monitoring. We would like to have monitoring implemented such that over time we could*
-> *measure ... and ... that would inform us about this ... behaviour of our application.*
 >
 > Answer:
 
